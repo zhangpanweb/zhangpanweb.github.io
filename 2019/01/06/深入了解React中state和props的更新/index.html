@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2"/>
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.0"/>
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="此文为译文，原文见：https://medium.com/react-in-depth/in-depth-explanation-of-state-and-props-update-in-react-51ab94563311  在上一篇文章中，我讲解了一些基础，这些基础是理解这篇文章中描述更新过程中的技术细节所必需的。 我讲述了在这篇文章中会用到的主要数据结构和概念，特别是 Fiber 节点、c">
+<meta name="keywords" content="react">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入了解React中state和props的更新">
+<meta property="og:url" content="http://yoursite.com/2019/01/06/深入了解React中state和props的更新/index.html">
+<meta property="og:site_name" content="渊虹小站">
+<meta property="og:description" content="此文为译文，原文见：https://medium.com/react-in-depth/in-depth-explanation-of-state-and-props-update-in-react-51ab94563311  在上一篇文章中，我讲解了一些基础，这些基础是理解这篇文章中描述更新过程中的技术细节所必需的。 我讲述了在这篇文章中会用到的主要数据结构和概念，特别是 Fiber 节点、c">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/react/Inside-Fiber/1.png">
+<meta property="og:image" content="http://yoursite.com/images/react/Inside-Fiber/4.jpg">
+<meta property="og:image" content="http://yoursite.com/images/react/Inside-Fiber/5.jpg">
+<meta property="og:updated_time" content="2019-02-17T03:35:39.374Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入了解React中state和props的更新">
+<meta name="twitter:description" content="此文为译文，原文见：https://medium.com/react-in-depth/in-depth-explanation-of-state-and-props-update-in-react-51ab94563311  在上一篇文章中，我讲解了一些基础，这些基础是理解这篇文章中描述更新过程中的技术细节所必需的。 我讲述了在这篇文章中会用到的主要数据结构和概念，特别是 Fiber 节点、c">
+<meta name="twitter:image" content="http://yoursite.com/images/react/Inside-Fiber/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/06/深入了解React中state和props的更新/"/>
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>深入了解React中state和props的更新 | 渊虹小站</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">渊虹小站</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">无诗无生活，有诗有远方</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br/>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br/>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/06/深入了解React中state和props的更新/"/>
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhangpanweb"/>
+      <meta itemprop="description" content="编程小记"/>
+      <meta itemprop="image" content="/images/avatar.gif"/>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="渊虹小站"/>
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深入了解React中state和props的更新
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-01-06 17:58:56" itemprop="dateCreated datePublished" datetime="2019-01-06T17:58:56+08:00">2019-01-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-02-17 11:35:39" itemprop="dateModified" datetime="2019-02-17T11:35:39+08:00">2019-02-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/译文/" itemprop="url" rel="index"><span itemprop="name">译文</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>此文为译文，原文见：<a href="https://medium.com/react-in-depth/in-depth-explanation-of-state-and-props-update-in-react-51ab94563311" target="_blank" rel="noopener">https://medium.com/react-in-depth/in-depth-explanation-of-state-and-props-update-in-react-51ab94563311</a></p>
+</blockquote>
+<p>在上<a href="https://medium.com/react-in-depth/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react-e1c04700ef6e" target="_blank" rel="noopener">一篇文章</a>中，我讲解了一些基础，这些基础是理解这篇文章中描述更新过程中的技术细节所必需的。</p>
+<p>我讲述了在这篇文章中会用到的主要数据结构和概念，特别是 Fiber 节点、current 和 work-in-progress 树、副作用和副作用列表。我也提供了一个主要算法的概览，并说明了 render 阶段和 commit 阶段的不同点。如果你还没有阅读上一篇文章，我推荐你从那里开始。</p>
+<p>我也介绍了一个简单的应用，只有一个按钮，点击后会增加渲染在屏幕上数字的大小。</p>
+<p><img src="/images/react/Inside-Fiber/1.png" alt=""></p>
+<p>它的实现如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props);</span><br><span class="line">    <span class="keyword">this</span>.state = &#123; <span class="attr">count</span>: <span class="number">0</span> &#125;;</span><br><span class="line">    <span class="keyword">this</span>.handleClick = <span class="keyword">this</span>.handleClick.bind(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  handleClick() &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(<span class="function"><span class="params">state</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123; <span class="attr">count</span>: state.count + <span class="number">1</span> &#125;;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentDidUpdate() &#123;&#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> [</span><br><span class="line">      &lt;button key=<span class="string">"1"</span> onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;</span><br><span class="line">        Update counter</span><br><span class="line">      &lt;<span class="regexp">/button&gt;,</span></span><br><span class="line"><span class="regexp">      &lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;</span><br><span class="line">    ];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里我给组件添加了<code>componentDidUpdate</code>生命周期方法，它将用于展示在 React 在 commit 阶段如添加影响，调用这个方法。</p>
+<p>在这篇文章中，我想向你展示 React 如何处理状态更新并建立副作用列表。我们将带你看到在 render 和 commit 阶段的高级函数中发生了什么。</p>
+<p>特别的，我们将看到在<code>completeWork</code>函数中，React 如何：</p>
+<ul>
+<li>更新<code>ClickCounter</code> <code>state</code>中的<code>count</code>属性</li>
+<li>调用<code>render</code>方法来获得一个子元素列表并执行对比</li>
+<li>更新<code>span</code>元素的属性</li>
+</ul>
+<p>和在<code>commitRoot</code>中，React：</p>
+<ul>
+<li>更新<code>span</code>元素的<code>textContent</code>属性</li>
+<li>调用<code>componentDidUpdate</code>生命周期方法</li>
+</ul>
+<p>在那之前，让我们先快速看一下当我们在点击处理函数中调用<code>setState</code>方法时，工作时如何调度的。</p>
+<p>注意，你不用理解这些也能使用 React，这篇文章时关于 React 内部是如何工作的。</p>
+<h4 id="调度更新"><a href="#调度更新" class="headerlink" title="调度更新"></a>调度更新</h4><p>当我们点击按钮时，<code>click</code>事件被触发，React 执行被传入 button 属性的回调。在我们的应用中，它仅仅增加计数并更新状态。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    handleClick() &#123;</span><br><span class="line">        <span class="keyword">this</span>.setState(<span class="function">(<span class="params">state</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> &#123;<span class="attr">count</span>: state.count + <span class="number">1</span>&#125;;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每个 React 组件有一个与之相关联的<code>updater</code>，它作为一个桥梁，连接组件和 React 核心。这使得<code>setState</code>能够能够被 React DOM、ReactNative、服务端渲染和测试工具中被以不同的方式进行实现。</p>
+<p>在这篇文章中，我们将看到 ReactDOM 中<code>updater</code>对象的实现，而 React DOM 中私用的则是 Fiber reconciler。对于<code>ClickCounter</code>组件来说，这个<code>updater</code>是<code>classComponentUpdater</code>。它负责获取一个 Fiber 实例、队列更新以及调度工作。</p>
+<p>当更新被加入队列中，他们被加入到需要在一个 Fiber 节点上被处理的更新的队列中。在我们的例子中，与<code>ClickCounter</code>组件相关联的 Fiber 节点有以下结构：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> ClickCounter,</span><br><span class="line">    type: ClickCounter,</span><br><span class="line">    updateQueue: &#123;</span><br><span class="line">         baseState: &#123;<span class="attr">count</span>: <span class="number">0</span>&#125;</span><br><span class="line">         firstUpdate: &#123;</span><br><span class="line">             next: &#123;</span><br><span class="line">                 payload: <span class="function">(<span class="params">state</span>) =&gt;</span> &#123; <span class="keyword">return</span> &#123;<span class="attr">count</span>: state.count + <span class="number">1</span>&#125; &#125;</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;,</span><br><span class="line">         ...</span><br><span class="line">     &#125;,</span><br><span class="line">     ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>正如你所能够看到的，<code>updateQueue.firstUpdate.next.payload</code>中的函数时我们传入到<code>ClickCounter</code>组件<code>setState</code>中的回调。它代表的是，在 render 阶段需要被处理的第一个更新。</p>
+<h4 id="处理-ClickCounter-Fiber-node-的更新"><a href="#处理-ClickCounter-Fiber-node-的更新" class="headerlink" title="处理 ClickCounter Fiber node 的更新"></a>处理 ClickCounter Fiber node 的更新</h4><p>我上篇文章中<a href="https://medium.com/react-in-depth/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react-e1c04700ef6e" target="_blank" rel="noopener">有关工作循环的章节</a>解释了<code>nextUnitOfWork</code>全局变量的作用。具体来说，章节中降到了，这个变量包含一个引用，指向<code>workInProgress</code>树中有工作需要被执行的 Fiber 节点。当 React 遍历 Fiber 树时，它使用这个遍历来知道是否有其他 Fiber 节点有未被完成的工作。</p>
+<p>让我们假设<code>setState</code>节点被调用了，React 把来自<code>setState</code>的回调增加到<code>ClickCounter</code>fiber 节点的<code>updateQueue</code>中，并且开始调度工作。React 进入 render 阶段。它从最高的<code>HostRoot</code>Fiber 节点开始，使用<code>renderRoot</code>方法来遍历树。然而，它会跳过已经被处理过的 Fiber 节点，直到发现一个有未处理工作的节点。在我们的例子中，只有一个 Fiber 节点有未完成工作，他就是<code>ClickCounter</code>Fiber 节点。</p>
+<p>所有的工作都会在这个 Fiber 节点的克隆副本上进行，这个克隆父辈被存放在<code>alternate</code>属性上。如果这个 alternate 节点还没有被创建，则 React 会在处理更新前，调用<code>createWorkInProgress</code>方法创建副本。让我们假设，变量<code>nextUnitOfWork</code>中存放了一个 alternate <code>ClickCounter</code> Fiber 节点的引用。</p>
+<h5 id="beginWork"><a href="#beginWork" class="headerlink" title="beginWork"></a>beginWork</h5><p>首先，我们的 Fiber 进入到<a href="https://github.com/facebook/react/blob/cbbc2b6c4d0d8519145560bd8183ecde55168b12/packages/react-reconciler/src/ReactFiberBeginWork.js#L1489" target="_blank" rel="noopener">beginWork</a>。</p>
+<blockquote>
+<p>因为这个方法会在一个树的每个 Fiber 节点上被执行，所以如果你想要 debug render 阶段，这个地方是一个打断点的好地方。我在这里打断点，并区检查一个 Fiber 节点的类型，来找到我需要的那个。</p>
+</blockquote>
+<p><code>beginWork</code>函数时一个大的<code>switch</code>语句，通过 Fiber 节点的 tag 来判断什么类型的工作需要在这个 Fiber 节点上被执行，然后执行对应的函数来处理工作。当<code>CountClicks</code>是一个类组件时，这个分支时这样的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">beginWork</span>(<span class="params">current$$<span class="number">1</span>, workInProgress, ...</span>) </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">switch</span> (workInProgress.tag) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">case</span> FunctionalComponent: &#123;...&#125;</span><br><span class="line">        <span class="keyword">case</span> ClassComponent:</span><br><span class="line">        &#123;</span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">return</span> updateClassComponent(current$$<span class="number">1</span>, workInProgress, ...);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> HostComponent: &#123;...&#125;</span><br><span class="line">        <span class="keyword">case</span> ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后我们进入到了<code>updateClassComponent</code>方法。根据这是组件的第一次渲染、或者时组件更新的恢复再或者是组件的更新，React 会创建一个实例、或者挂载这个组件再或者更新它：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateClassComponent</span>(<span class="params">current, workInProgress, Component, ...</span>) </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">const</span> instance = workInProgress.stateNode;</span><br><span class="line">    <span class="keyword">let</span> shouldUpdate;</span><br><span class="line">    <span class="keyword">if</span> (instance === <span class="literal">null</span>) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// In the initial pass we might need to construct the instance.</span></span><br><span class="line">        constructClassInstance(workInProgress, Component, ...);</span><br><span class="line">        mountClassInstance(workInProgress, Component, ...);</span><br><span class="line">        shouldUpdate = <span class="literal">true</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (current === <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// In a resume, we'll already have an instance we can reuse.</span></span><br><span class="line">        shouldUpdate = resumeMountClassInstance(workInProgress, Component, ...);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        shouldUpdate = updateClassInstance(current, workInProgress, ...);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> finishClassComponent(current, workInProgress, Component, shouldUpdate, ...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="处理-ClickCounter-Fiber-的更新"><a href="#处理-ClickCounter-Fiber-的更新" class="headerlink" title="处理 ClickCounter Fiber 的更新"></a>处理 ClickCounter Fiber 的更新</h5><p>我们已经有了一个<code>ClickCounter</code>组件的实例，所以我们进入到<code>updateClassInstance</code>方法中。这是 React 执行大部分类组件工作的地方。在这个函数中执行的重要操作，安装执行顺序排列如下：</p>
+<ul>
+<li>调用<code>UNSAFE_componentWillReceiveProps()</code>钩子（deprecated）</li>
+<li>处理<code>updateQueue</code>中的更新，并产生一个新的状态</li>
+<li>使用新状态调用<code>getDerivedStateFromProps</code>获得结果</li>
+<li>调用<code>shouldComponentUpdate</code>来保证组件确实需要被更新；如果结果为 false，则跳过整个渲染阶段，包括在这个组件和其子组件上调用 render；否则则处理更新</li>
+<li>调用<code>UNSAFE_componentWillUpdate</code>（depricated）</li>
+<li>增加一个影响，用来出发<code>componentDidUpdate</code>生命周期钩子</li>
+</ul>
+<blockquote>
+<p>虽然调用<code>componentDidUpdate</code>的影响时在 render 阶段被添加的，但是这个方法时在 commit 阶段被执行的。</p>
+</blockquote>
+<ul>
+<li>在组件实例上更新<code>state</code>和<code>props</code></li>
+</ul>
+<blockquote>
+<p>state 和 props 子 render 方法被调用之前在组件实例上被更新，因为 render 方法的结果往往取决于 state 和 props。如果不这样做，每次 render 方法都将返回相同的结果。</p>
+</blockquote>
+<p>下面是这个方法的一个简化版本：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateClassInstance</span>(<span class="params">current, workInProgress, ctor, newProps, ...</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> instance = workInProgress.stateNode;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> oldProps = workInProgress.memoizedProps;</span><br><span class="line">    instance.props = oldProps;</span><br><span class="line">    <span class="keyword">if</span> (oldProps !== newProps) &#123;</span><br><span class="line">        callComponentWillReceiveProps(workInProgress, instance, newProps, ...);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> updateQueue = workInProgress.updateQueue;</span><br><span class="line">    <span class="keyword">if</span> (updateQueue !== <span class="literal">null</span>) &#123;</span><br><span class="line">        processUpdateQueue(workInProgress, updateQueue, ...);</span><br><span class="line">        newState = workInProgress.memoizedState;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    applyDerivedStateFromProps(workInProgress, ...);</span><br><span class="line">    newState = workInProgress.memoizedState;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> shouldUpdate = checkShouldComponentUpdate(workInProgress, ctor, ...);</span><br><span class="line">    <span class="keyword">if</span> (shouldUpdate) &#123;</span><br><span class="line">        instance.componentWillUpdate(newProps, newState, nextContext);</span><br><span class="line">        workInProgress.effectTag |= Update;</span><br><span class="line">        workInProgress.effectTag |= Snapshot;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    instance.props = newProps;</span><br><span class="line">    instance.state = newState;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> shouldUpdate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码片段中，我移除了一些辅助代码。比如说，在调用生命周期周期方法或增加触发他们的影响时之前，React 会使用<code>typeof</code>操作符检查一个组件是否实现了这些方法。比如说，增加影响前，对<code>componentDidUpdate</code>方法的检查：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> instance.componentDidUpdate === <span class="string">"function"</span>) &#123;</span><br><span class="line">  workInProgress.effectTag |= Update;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以，我们知道了在 render 阶段，会有哪些操作在<code>ClickCounter</code>Fiber 节点上执行。让我们现在来看看这些操作如何更不 Fiber 节点上的值。当 React 开始工作时，<code>ClickCounter</code>对应的 Fiber 节点看起来类似于下面的样子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    effectTag: <span class="number">0</span>,</span><br><span class="line">    elementType: <span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span>,</span></span><br><span class="line">    firstEffect: null,</span><br><span class="line">    memoizedState: &#123;<span class="attr">count</span>: <span class="number">0</span>&#125;,</span><br><span class="line">    type: <span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span>,</span></span><br><span class="line">    stateNode: &#123;</span><br><span class="line">        state: &#123;<span class="attr">count</span>: <span class="number">0</span>&#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    updateQueue: &#123;</span><br><span class="line">        baseState: &#123;<span class="attr">count</span>: <span class="number">0</span>&#125;,</span><br><span class="line">        firstUpdate: &#123;</span><br><span class="line">            next: &#123;</span><br><span class="line">                payload: <span class="function">(<span class="params">state, props</span>) =&gt;</span> &#123;…&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完成工作后，FIber 节点将看起来像这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    effectTag: <span class="number">4</span>,</span><br><span class="line">    elementType: <span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span>,</span></span><br><span class="line">    firstEffect: null,</span><br><span class="line">    memoizedState: &#123;<span class="attr">count</span>: <span class="number">1</span>&#125;,</span><br><span class="line">    type: <span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span>,</span></span><br><span class="line">    stateNode: &#123;</span><br><span class="line">        state: &#123;<span class="attr">count</span>: <span class="number">1</span>&#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    updateQueue: &#123;</span><br><span class="line">        baseState: &#123;<span class="attr">count</span>: <span class="number">1</span>&#125;,</span><br><span class="line">        firstUpdate: <span class="literal">null</span>,</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>让我们花点时间来看下属性值的变化。</p>
+<p>在更新被实施之后，<code>memoizedState</code>和<code>updateQueue</code>中<code>baseState</code>，count 属性的值变为了 1。React 也更新了<code>ClickCounter</code>组件实例中的状态。</p>
+<p>在这时，在队列中已经没有更新，所以<code>firstUpdate</code>的值时<code>null</code>。另外，重要的是，我们更新了<code>effectTag</code>属性。它不再是 0，而是 4。4 的二进制是 100，也就是第三字节被设置了，而这正是<code>update</code>副作用 tag 的字节：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> Update = <span class="number">0b00000000100</span>;</span><br></pre></td></tr></table></figure>
+<p>总结来说，当处理父元素<code>ClickCounter</code>Fiber 节点时，React 会调用变更前生命周期方法，更新状态并定义相关的副作用。</p>
+<h5 id="reconcililng-ClickCounter-Fiber-子元素"><a href="#reconcililng-ClickCounter-Fiber-子元素" class="headerlink" title="reconcililng ClickCounter Fiber 子元素"></a>reconcililng ClickCounter Fiber 子元素</h5><p>一旦上面说的都完成了，React 则会进入<code>finishClassComponent</code>。这是 React 调用一个组件实例 render 方法的地方，并且会将对比算法运用在组件返回的子元素上。有关这个概览可以在<a href="https://reactjs.org/docs/reconciliation.html#the-diffing-algorithm" target="_blank" rel="noopener">文档</a>中看到。相关部分如下：</p>
+<blockquote>
+<p>当对比两个相同类型的 React DOM 元素，React 检查他们两个的属性、保持其下相同的 DOM 节点，仅仅更新变更过的属性。</p>
+</blockquote>
+<p>如果深入了解，我们会发现，其实它对比的是 Fiber 节点和 React 元素。我不会深入到这些细节。我会单独写有关子 reconciliation 的文章。</p>
+<blockquote>
+<p>如果你很好奇里面的细节，你也可以去看<code>reconcileChildrenArray</code>方法，因为在我们的应用中，render 方法返回了一个 React 元素组成的数组。</p>
+</blockquote>
+<p>到这里，有两个需要注意的点。首先，当 React 进行子 reconciliation 过程时，它创建或更新从 render 方法返回子 React 元素的 Fiber 节点。<code>finishClassComponent</code>函数返回对 current Fiber 节点的第一个孩子的引用。这个引用会被赋值给<code>nextUnitOfWork</code>，并且在工作循环中被处理。其次，React 把在孩子上更新 props 的工作看作是在其父元素工作的一部分。这个过程，用到了来自 React 元素 render 方法返回的数据。</p>
+<p>比如，在 React reconcile ClickCounter fiber 的孩子之前，span 元素对应的 Fiber 节点看起来是这样的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">    type: <span class="string">"span"</span>,</span><br><span class="line">    key: <span class="string">"2"</span>,</span><br><span class="line">    memoizedProps: &#123;<span class="attr">children</span>: <span class="number">0</span>&#125;,</span><br><span class="line">    pendingProps: &#123;<span class="attr">children</span>: <span class="number">0</span>&#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>正如你所看到的，在<code>memoizedProps</code>和<code>pendingProps</code>中，<code>children</code>属性都是 0。下面是 span 元素 render 方法返回的结构：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  $$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element);</span><br><span class="line">  key: <span class="string">"2"</span>;</span><br><span class="line">  props: &#123;</span><br><span class="line">    children: <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  ref: <span class="literal">null</span>;</span><br><span class="line">  type: <span class="string">"span"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>正如你所看到的，Fiber 节点和返回的 React 元素的 props 是不同的。在用来创建 alernate Fiber 节点的<code>createWorkInProgress</code>方法中，React 会把更新后的属性从 React 元素复制到 Fiber 节点中。</p>
+<p>所以，React 在 ClickCounter 组件上完成 reconcile 子元素后，span Fiber 节点将会有一个<code>pendingProps</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">    type: <span class="string">"span"</span>,</span><br><span class="line">    key: <span class="string">"2"</span>,</span><br><span class="line">    memoizedProps: &#123;<span class="attr">children</span>: <span class="number">0</span>&#125;,</span><br><span class="line">    pendingProps: &#123;<span class="attr">children</span>: <span class="number">1</span>&#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后，当 React 在 span Fiber 节点上执行工作时，它会把它们复制给<code>memoizedProps</code>，并且增加影响来更新 DOM。</p>
+<p>这就是 render 阶段，React 对 ClickCounter fiber 节点做的所有工作。因为 button 是 ClickCounter 的第一个孩子，所以它会被赋值给<code>nextUnitOfWork</code>变量。对于它来说，这里并没有需要做的事情，所以 React 会转向它的兄弟，也就是 span Fiber 节点。根据在<a href="https://medium.com/react-in-depth/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react-e1c04700ef6e#25fb" target="_blank" rel="noopener">这里</a>描述的算法，这个转移发生在<code>completeUnitOfWork</code>方法中。</p>
+<h5 id="处理-span-fiber-的更新"><a href="#处理-span-fiber-的更新" class="headerlink" title="处理 span fiber 的更新"></a>处理 span fiber 的更新</h5><p>所以，这时<code>nextUnitOfWork</code>指向 span fiber 的 alternate，并且 React 开始在它上面执行工作。和在 ClickCounter 执行工作的步骤类似，我们以<code>beginWork</code>方法开始。</p>
+<p>因为我们的 span 节点是<code>HostComponent</code>类型，所以这次，在 switch 语句中，React 会采用以下分支：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">beginWork</span>(<span class="params">current$$<span class="number">1</span>, workInProgress, ...</span>) </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">switch</span> (workInProgress.tag) &#123;</span><br><span class="line">        <span class="keyword">case</span> FunctionalComponent: &#123;...&#125;</span><br><span class="line">        <span class="keyword">case</span> ClassComponent: &#123;...&#125;</span><br><span class="line">        <span class="keyword">case</span> HostComponent:</span><br><span class="line">          <span class="keyword">return</span> updateHostComponent(current, workInProgress, ...);</span><br><span class="line">        <span class="keyword">case</span> ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它将以<code>updateHostComponent</code>方法结束。它对应于类组件的<code>updateClassComponent</code>方法。对于一个函数组件来说，它是<code>updateFunctionComponent</code>，等等。你可以在<code>ReactFiberBeginWork.js</code>中找到所有的这些方法。</p>
+<h5 id="reconcile-span-fiber-的子元素"><a href="#reconcile-span-fiber-的子元素" class="headerlink" title="reconcile span fiber 的子元素"></a>reconcile span fiber 的子元素</h5><p>在我们的例子中，对于 span 节点，<code>updateHostComponent</code>中并没有什么重要的内容。</p>
+<h5 id="完成-span-Fiber-节点的工作"><a href="#完成-span-Fiber-节点的工作" class="headerlink" title="完成 span Fiber 节点的工作"></a>完成 span Fiber 节点的工作</h5><p>一旦<code>beginWork</code>结束，这个节点进入到<code>completeWork</code>方法中。但是在这之前，React 需要更新 span fiber 的<code>memoizedProps</code>。你应该还记得当在 ClickCounter 组件上 reconcile 孩子时，React 更新了 span Fiber 节点的<code>pendingProps</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">    type: <span class="string">"span"</span>,</span><br><span class="line">    key: <span class="string">"2"</span>,</span><br><span class="line">    memoizedProps: &#123;<span class="attr">children</span>: <span class="number">0</span>&#125;,</span><br><span class="line">    pendingProps: &#123;<span class="attr">children</span>: <span class="number">1</span>&#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以，一旦 span fiber 的<code>beginWork</code>完成，React 会更新<code>pendingProps</code>到对应的<code>memoizedProps</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">performUnitOfWork</span>(<span class="params">workInProgress</span>) </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    next = beginWork(current$$<span class="number">1</span>, workInProgress, nextRenderExpirationTime);</span><br><span class="line">    workInProgress.memoizedProps = workInProgress.pendingProps;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后它会调用<code>completeWork</code>方法，它和<code>beginWork</code>类似，都是一个大的<code>swtich</code>语句：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">completeWork</span>(<span class="params">current, workInProgress, ...</span>) </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">switch</span> (workInProgress.tag) &#123;</span><br><span class="line">        <span class="keyword">case</span> FunctionComponent: &#123;...&#125;</span><br><span class="line">        <span class="keyword">case</span> ClassComponent: &#123;...&#125;</span><br><span class="line">        <span class="keyword">case</span> HostComponent: &#123;</span><br><span class="line">            ...</span><br><span class="line">            updateHostComponent(current, workInProgress, ...);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">case</span> ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为 span 节点是<code>HostComponent</code>，所以它会运行<code>updateHostComponent</code>方法。在这个方法中，React 大致会执行以下动作：</p>
+<ul>
+<li>准备 DOM 更新</li>
+<li>把它们增加到 span fiber 的<code>updateQueue</code>中</li>
+<li>增加更新 DOM 的影响</li>
+</ul>
+<p>在操作执行之前，span 节点看起来像这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">    type: <span class="string">"span"</span>,</span><br><span class="line">    effectTag: <span class="number">0</span></span><br><span class="line">    updateQueue: <span class="literal">null</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完成后，它看起来像这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">    type: <span class="string">"span"</span>,</span><br><span class="line">    effectTag: <span class="number">4</span>,</span><br><span class="line">    updateQueue: [<span class="string">"children"</span>, <span class="string">"1"</span>],</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意<code>effectTag</code>和<code>updateQueue</code>属性的不同。<code>effectTag</code>由 0 变为 4，4 的二进制是 100，正是更新副作用 tag 对应的值。这是在下面 commit 阶段 React 在这节点上唯一需要做的（指的是执行更新副作用）。<code>udpateQueue</code>顺序中装载了需要被用于更新的内容。</p>
+<p>一旦 React 处理完 ClickCounter 和它的孩子，render 阶段就结束了。现在可以在<code>FibeRoot</code>上把已完成的 alternate 树赋值给<code>finishWork</code>属性了。这也是需要被更新到屏幕上的新树。这可能会立即执行，也可能需要等一下，等到浏览器给 React 时间执行时。</p>
+<h4 id="影响列表"><a href="#影响列表" class="headerlink" title="影响列表"></a>影响列表</h4><p>在我们的例子中，因为 span 节点和 ClickCounter 组件有副作用，React 会增加一个来联系，链接 span Fiber 节点和<code>HostFiber</code>的<code>firstEffect</code>属性。</p>
+<p>React 会在<a href="https://github.com/facebook/react/blob/d5e1bf07d086e4fc1998653331adecddcd0f5274/packages/react-reconciler/src/ReactFiberScheduler.js#L999" target="_blank" rel="noopener"><code>completeUnitOfWork</code></a>方法中构建一个影响列表。在我们的例子中，span 节点需要更新 text、ClickCounter 有回调钩子，其标识出影响的 Fiber 树如下：</p>
+<p><img src="/images/react/Inside-Fiber/4.jpg" alt="fiber tree with effect"></p>
+<p>如下时带影响的节点构成的线性列表：</p>
+<p><img src="/images/react/Inside-Fiber/5.jpg" alt=""></p>
+<h4 id="commit-阶段"><a href="#commit-阶段" class="headerlink" title="commit 阶段"></a>commit 阶段</h4><p>这个阶段开始于<code>completeRoot</code>。在开始其他工作之前，它先把<code>FiberRoot</code>上的<code>finishdedWork</code>属性设置为<code>null</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root.finishedWork = <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+<p>不像 render 阶段，commit 阶段总是同步的，所以可以安全更新<code>HostRoot</code>，用以显示 commit 的工作已经开始。</p>
+<p>commit 阶段是 React 更新 DOM、调用更新后生命周期方法<code>componentDidUpdate</code>的地方。为了做到这些，它会遍历在 render 阶段构建起来的影响列表，并应用他们。</p>
+<p>在 render 阶段，对于 span 和 clickCounter 节点，我们有了以下影响：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">type</span>: ClickCounter, <span class="attr">effectTag</span>: <span class="number">5</span> &#125;</span><br><span class="line">&#123; <span class="attr">type</span>: <span class="string">'span'</span>, <span class="attr">effectTag</span>: <span class="number">4</span> &#125;</span><br></pre></td></tr></table></figure>
+<p>ClickCounter effect tag 的值是 5，也就是二进制的 101，它定义了更新工作，在类组件中，它被翻译为<code>componentDidUpdate</code>生命周期方法。最后一位被设置，用来表明，对这个 Fiber 节点来说，render 阶段的所有的工作都已完成。</p>
+<p>span 的 effect tag，值为 4，也就是二进制的 100，它定义的更新工作是 host 组件的 DOM 更新。对于 span 元素来说，React 需要更新元素的<code>textContent</code>。</p>
+<h4 id="应用影响"><a href="#应用影响" class="headerlink" title="应用影响"></a>应用影响</h4><p>让我们来看看 React 如何应用这些影响。用来应用影响的方法，<code>commitRoot</code>，一共有三个子函数构成：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitRoot</span>(<span class="params">root, finishedWork</span>) </span>&#123;</span><br><span class="line">  commitBeforeMutationLifecycles();</span><br><span class="line">  commitAllHostEffects();</span><br><span class="line">  root.current = finishedWork;</span><br><span class="line">  commitAllLifeCycles();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每一个子函数都会实现一个循环，这个循环会遍历影响列表，检查影响类型。如果它找到这个函数被设计应用到的影响，则它会实际应用这个影响。在我们的例子中，它会调用在 ClickCounter 组件上<code>componentDidUpdate</code>生命周期方法、更新 span 元素的 text。</p>
+<p>第一个函数 <a href="https://github.com/facebook/react/blob/fefa1269e2a67fa5ef0992d5cc1d6114b7948b7e/packages/react-reconciler/src/ReactFiberCommitWork.js#L183" target="_blank" rel="noopener">commitBeforeMutationLifeCycles</a>会查找<code>Snapshot</code>影响，并调用<code>getSnapshotBeforeUpdate</code>方法。但是，我们不用在 ClickCounter 组件上调用这个方法，因为 React 在 render 阶段并没有添加这个影响。所以在我们的例子中，这个函数什么都不会做。</p>
+<h4 id="DOM-更新"><a href="#DOM-更新" class="headerlink" title="DOM 更新"></a>DOM 更新</h4><p>接下来，React 移动到<code>commitAllHostEffects</code>函数。在这里，React 将会把 span 元素的 text 由 0 变为 1。在这里，对于 ClickCounter 组件什么都不会做，因为类组件对应的节点没有任何 DOM 更新。</p>
+<p>函数的实现是，它挑选对应类型的影响，并进行对应的操作。在我们的例子中，我们需要更新 span 元素的 text，所以我们会采用<code>Update</code>分支：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateHostEffects</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (primaryEffectTag) &#123;</span><br><span class="line">      <span class="keyword">case</span> Placement: &#123;...&#125;</span><br><span class="line">      <span class="keyword">case</span> PlacementAndUpdate: &#123;...&#125;</span><br><span class="line">      <span class="keyword">case</span> Update:</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">var</span> current = nextEffect.alternate;</span><br><span class="line">          commitWork(current, nextEffect);</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      <span class="keyword">case</span> Deletion: &#123;...&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>顺着<code>commitWork</code>方法而下，我们最终会进入到<code>updateDOMProperties</code>方法，它会使用在 render 阶段添加到 Fiber 节点上的<code>updateQueue</code>来更新 span 元素的<code>texttContent</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateDOMProperties</span>(<span class="params">domElement, updatePayload, ...</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; updatePayload.length; i += <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> propKey = updatePayload[i];</span><br><span class="line">    <span class="keyword">const</span> propValue = updatePayload[i + <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">if</span> (propKey === STYLE) &#123; ...&#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (propKey === DANGEROUSLY_SET_INNER_HTML) &#123;...&#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (propKey === CHILDREN) &#123;</span><br><span class="line">      setTextContent(domElement, propValue);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;...&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 DOM 更新被应用之后，React 会把<code>finishedWork</code>树赋值给<code>HostRoot</code>。它会把 alternate 树设置为 current 树：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root.current = finishedWork;</span><br></pre></td></tr></table></figure>
+<h4 id="调用更新后生命周期钩子"><a href="#调用更新后生命周期钩子" class="headerlink" title="调用更新后生命周期钩子"></a>调用更新后生命周期钩子</h4><p>剩下的最后一个函数是<code>commitAllLifecycles</code>。这是 React 调用更新后生命周期方法的地方。在 render 阶段，React 给 ClickCounter 方法添加了 <code>Update</code>影响。这是<code>commitAllLifecycles</code>函数寻找的并调用<code>componentDidUpdate</code>方法的影响之一：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitAllLifeCycles</span>(<span class="params">finishedRoot, ...</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (nextEffect !== <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">const</span> effectTag = nextEffect.effectTag;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (effectTag &amp; (Update | Callback)) &#123;</span><br><span class="line">            <span class="keyword">const</span> current = nextEffect.alternate;</span><br><span class="line">            commitLifeCycles(finishedRoot, current, nextEffect, ...);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (effectTag &amp; Ref) &#123;</span><br><span class="line">            commitAttachRef(nextEffect);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        nextEffect = nextEffect.nextEffect;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法也会更新<code>refs</code>，但是因为我们没有任何 refs，所以这个功能不会被用到。<a href="https://github.com/facebook/react/blob/e58ecda9a2381735f2c326ee99a1ffa6486321ab/packages/react-reconciler/src/ReactFiberCommitWork.js#L351" target="_blank" rel="noopener"><code>commitLifeCycles</code></a>如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitLifeCycles</span>(<span class="params">finishedRoot, current, ...</span>) </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">switch</span> (finishedWork.tag) &#123;</span><br><span class="line">    <span class="keyword">case</span> FunctionComponent: &#123;...&#125;</span><br><span class="line">    <span class="keyword">case</span> ClassComponent: &#123;</span><br><span class="line">      <span class="keyword">const</span> instance = finishedWork.stateNode;</span><br><span class="line">      <span class="keyword">if</span> (finishedWork.effectTag &amp; Update) &#123;</span><br><span class="line">        <span class="keyword">if</span> (current === <span class="literal">null</span>) &#123;</span><br><span class="line">          instance.componentDidMount();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          ...</span><br><span class="line">          instance.componentDidUpdate(prevProps, prevState, ...);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> HostComponent: &#123;...&#125;</span><br><span class="line">    <span class="keyword">case</span> ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你也可以看到，这个方法也是 React 给第一次渲染的组件调用<code>componentDidMount</code>的地方。</p>
+<p>以上，就是这些了。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/react/" rel="tag"># react</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/06/Fiber内部：深入了解React中新的reconciliation算法/" rel="next" title="Fiber内部：深入了解React中新的reconciliation算法">
+                <i class="fa fa-chevron-left"></i> Fiber内部：深入了解React中新的reconciliation算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/17/Nextjs简介/" rel="prev" title="Nextjs简介">
+                Nextjs简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zhangpanweb</p>
+              <p class="site-description motion-element" itemprop="description">编程小记</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#调度更新"><span class="nav-number">1.</span> <span class="nav-text">调度更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#处理-ClickCounter-Fiber-node-的更新"><span class="nav-number">2.</span> <span class="nav-text">处理 ClickCounter Fiber node 的更新</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#beginWork"><span class="nav-number">2.1.</span> <span class="nav-text">beginWork</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#处理-ClickCounter-Fiber-的更新"><span class="nav-number">2.2.</span> <span class="nav-text">处理 ClickCounter Fiber 的更新</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#reconcililng-ClickCounter-Fiber-子元素"><span class="nav-number">2.3.</span> <span class="nav-text">reconcililng ClickCounter Fiber 子元素</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#处理-span-fiber-的更新"><span class="nav-number">2.4.</span> <span class="nav-text">处理 span fiber 的更新</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#reconcile-span-fiber-的子元素"><span class="nav-number">2.5.</span> <span class="nav-text">reconcile span fiber 的子元素</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#完成-span-Fiber-节点的工作"><span class="nav-number">2.6.</span> <span class="nav-text">完成 span Fiber 节点的工作</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#影响列表"><span class="nav-number">3.</span> <span class="nav-text">影响列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#commit-阶段"><span class="nav-number">4.</span> <span class="nav-text">commit 阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#应用影响"><span class="nav-number">5.</span> <span class="nav-text">应用影响</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DOM-更新"><span class="nav-number">6.</span> <span class="nav-text">DOM 更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#调用更新后生命周期钩子"><span class="nav-number">7.</span> <span class="nav-text">调用更新后生命周期钩子</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhangpanweb</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.0"></script>
+
+  <script src="/js/src/motion.js?v=7.0.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.0"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.0"></script>
+<script src="/js/src/post-details.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=7.0.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
