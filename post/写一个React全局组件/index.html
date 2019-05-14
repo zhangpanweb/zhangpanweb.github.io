@@ -1,0 +1,92 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="/styles.770cf382041e7ad46ae0.css">code[class*=language-],pre[class*=language-]{color:#c5c8c6;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Inconsolata,Monaco,Courier New,Courier,monospace;direction:ltr;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#1d1f21}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#7c7c7c}.token.punctuation{color:#c5c8c6}.namespace{opacity:.7}.token.keyword,.token.property,.token.tag{color:#96cbfe}.token.class-name{color:#ffffb6;text-decoration:underline}.token.boolean,.token.constant{color:#9c9}.token.deleted,.token.symbol{color:#f92672}.token.number{color:#ff73fd}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a8ff60}.token.variable{color:#c6c5fe}.token.operator{color:#ededed}.token.entity{color:#ffffb6}.token.url{color:#96cbfe}.language-css .token.string,.style .token.string{color:#87c38a}.token.atrule,.token.attr-value{color:#f9ee98}.token.function{color:#dad085}.token.regex{color:#e9c062}.token.important{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}body,html{background-color:#f3f3f3;word-break:break-word}@font-face{font-family:Consolas;src:url(/static/consola-dd67cc82c437fd23ab38a8efead69e47.ttf) format("truetype")}blockquote{position:relative}blockquote:before{content:"";position:absolute;margin-left:-20px;width:5px;height:100%;background:#eaeaea}:not(pre)>code[class*=language-]{background:#efefed;color:rgba(23,22,22,.92);text-shadow:none;font-size:100%}pre[class*=language-]{background:#313131;font-size:13px}</style><meta name="generator" content="Gatsby 2.1.11"/><title data-react-helmet="true"></title><link as="script" rel="preload" href="/component---src-templates-post-js-79b80049d6f02b2f808c.js"/><link as="script" rel="preload" href="/styles-e6b6a307c6b9df920a5d.js"/><link as="script" rel="preload" href="/app-9e853ca0473879fabc7b.js"/><link as="script" rel="preload" href="/webpack-runtime-e9b6a546e66f865ac139.js"/><link as="fetch" rel="preload" href="/static/d/724/path---post-写一个-react全局组件-ea-1-d27-jkbGiMwjoohcjTkTJHNZabYE.json" crossorigin="use-credentials"/></head><body><noscript id="gatsby-noscript">This app works best with JavaScript enabled.</noscript><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group"><style data-emotion-css="1am5tay">.css-1am5tay{margin:50px auto 50px;max-width:770px;padding-top:50px;padding:50px;background:white;}</style><div class="css-1am5tay ezt8jpi0"><style data-emotion-css="bqntim">.css-bqntim{margin-bottom:50px;font-size:25px;}</style><h2 class="css-bqntim ezt8jpi1">写一个React全局组件</h2><style data-emotion-css="s4undb">.css-s4undb{font-size:15px;}.css-s4undb h6{font-size:100%;}.css-s4undb h5{font-size:120%;}.css-s4undb h4{font-size:140%;}.css-s4undb h2{font-size:200%;}.css-s4undb *{line-height:1.8;}</style><div class="css-s4undb"><p>创建一个React组件库时，类似于<code class="language-text">&lt;Button/&gt;</code>这类局部组件，是页面上的一个固定元素，所以相对来说，写起来比较直观，只需要定义一个组件，让用户直接去引用就可以了。但是对于"弹框"这种全局组件，应该如何写呢？应该如何控制组件的展示呢？</p>
+<p>引用局部组件的思路是，让用户从组件层面控制弹框的展示，最后用户使用的代码大概是这个样子。如果<code class="language-text">displayModal</code>为false，则渲染null，从而使组件消失；如果为true，则渲染组件，让组件出现。</p>
+<div class="gatsby-highlight" data-language="jsx"><pre class="language-jsx"><code class="language-jsx"><span class="token keyword">const</span> <span class="token function-variable function">App</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>displayModal<span class="token punctuation">,</span>setDisplayModal<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+  	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span><span class="token plain-text">
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">onClick</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token function">setDisplayModal</span><span class="token punctuation">(</span><span class="token operator">!</span>displayModal<span class="token punctuation">)</span><span class="token punctuation">}</span></span><span class="token punctuation">></span></span><span class="token plain-text">Click</span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span class="token plain-text">
+    	</span><span class="token punctuation">{</span> displayModal <span class="token operator">?</span> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Modal</span><span class="token punctuation">/></span></span> <span class="token punctuation">:</span> <span class="token keyword">null</span> <span class="token punctuation">}</span><span class="token plain-text">
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre></div>
+<p>但是这种带来的麻烦就是，组件位于在第一层<code class="language-text">&lt;div&gt;</code>内部，任何外层样式都可能会影响到组件的样式，导致每次都需要使用者去手动调整样式。</p>
+<hr>
+<h4>组件直接写在全局上</h4>
+<p>既然在这个层级内，样式会被干扰到，那么很自然地，需要把组件写到body下面。一种比较直接的方式当然就是在最上层组件里面，加一个Modal组件，然后下层去控制这个Modal的展示与否，大概是这样的：</p>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token function-variable function">App</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+  	<span class="token operator">&lt;</span><span class="token operator">></span>
+    	<span class="token punctuation">{</span><span class="token comment">/* 其他逻辑组件 */</span><span class="token punctuation">}</span>
+    	<span class="token operator">&lt;</span>Modal<span class="token operator">/</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span><span class="token operator">></span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre></div>
+<p>这样造成的一是如果有很多全局组件，则要在App下面写一堆组件，显得非常繁琐；二是逻辑分散，如果你写的是组件库，则相当于用户需要在它的最上层组件中去引用，然后在下层组件中去写控制逻辑；三是，如果这样写，Modal和下层组件被隔离开，需要另想办法来控制组件的展示与否</p>
+<hr>
+<h4>使用Portal</h4>
+<p>React的Portal可以达到，在组件中，可以突破组件层级，将某个组件渲染到一个层级外组件下面，作为那个组件的子组件。使用Portal的写法大概是：</p>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token function-variable function">ConfirmModal</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> visible <span class="token operator">=</span> <span class="token boolean">false</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> Modal <span class="token operator">=</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token punctuation">{</span><span class="token function">cname</span><span class="token punctuation">(</span><span class="token string">'confirm-modal-container'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> hidden<span class="token punctuation">:</span> <span class="token operator">!</span>visible <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token operator">></span>
+      <span class="token punctuation">{</span><span class="token comment">/* modal content */</span><span class="token punctuation">}</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>visible<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      ReactDOM<span class="token punctuation">.</span><span class="token function">createPortal</span><span class="token punctuation">(</span>
+        Modal<span class="token punctuation">,</span>
+        document<span class="token punctuation">.</span>body
+      <span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>visible<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre></div>
+<p>通过visible属性来控制组件的展示与否，如果可见，则返回一个<code class="language-text">ReactDOM.createPortal(Modal,document.body)</code>，否则返回null。在这种情况下，生成的Modal则会变为body的子元素，从而突破层级限制，Modal的样式也不会受到其他组件的影响，Modal的样式大概可以这样：</p>
+<div class="gatsby-highlight" data-language="css"><pre class="language-css"><code class="language-css"><span class="token selector">.confirm-modal-container</span><span class="token punctuation">{</span>
+  <span class="token property">position</span><span class="token punctuation">:</span> fixed<span class="token punctuation">;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> <span class="token function">rgba</span><span class="token punctuation">(</span>128, 128, 128, 0.5<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token property">top</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+  <span class="token property">bottom</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+  <span class="token property">left</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+  <span class="token property">right</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div>
+<p>这样自然就形成了一个全局的蒙层。</p>
+<p>另外，在上面情况下，初始是不可见，变为可见后，Modal会被生成称为body的直接子元素；当visible属性由true变为fasle时，由于最后渲染的是null，所以Modal会从body下被移除。</p>
+<hr>
+<h4>通过类名控制可见性</h4>
+<p>上面的情况已经基本可以达到要求了，但是，每次的可见性切换，都会执行DOM插入与移除操作。一般的可见性都可以通过类名控制，所以做一个小小的更新：</p>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token keyword">const</span> <span class="token function-variable function">ConfirmModal</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> visible <span class="token operator">=</span> <span class="token boolean">false</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> hasShow <span class="token operator">=</span> <span class="token function">useRef</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> Modal <span class="token operator">=</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div className<span class="token operator">=</span><span class="token punctuation">{</span><span class="token function">cname</span><span class="token punctuation">(</span><span class="token string">'confirm-modal-container'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> hidden<span class="token punctuation">:</span> <span class="token operator">!</span>visible <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token operator">></span>
+      <span class="token punctuation">{</span><span class="token comment">/* modal content */</span><span class="token punctuation">}</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">let</span> portal <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>visible <span class="token operator">||</span> hasShow<span class="token punctuation">.</span>current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>hasShow<span class="token punctuation">.</span>current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      hasShow<span class="token punctuation">.</span>current <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    portal <span class="token operator">=</span> <span class="token punctuation">(</span>
+      ReactDOM<span class="token punctuation">.</span><span class="token function">createPortal</span><span class="token punctuation">(</span>
+        Modal<span class="token punctuation">,</span>
+        document<span class="token punctuation">.</span>body
+      <span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>visible <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>hasShow<span class="token punctuation">.</span>current<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    portal <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">return</span> portal<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre></div>
+<p>如下：</p>
+<ul>
+<li>初始情况下，visible为false。通过<code class="language-text">useRef</code>设置一个<code class="language-text">hasShow</code>属性，初始值为false，用来表示弹框是否是第一次展示。如果visible为false，并且是第一次展示，则渲染null。</li>
+<li>如果visible变为true，则将<code class="language-text">hasShow</code>置为true，表示已经展示过。此时返回<code class="language-text">React.createPortal</code>，向body下插入Modal</li>
+<li>此时，当visible再次从true变为false时，不再返回null，相反，还是返回<code class="language-text">React.createPortal</code>，只不过此时内部被增加一个hidden类，针对这个类设置<code class="language-text">display:none</code>，从而起到隐藏作用</li>
+<li>再当visible从false变为true时，则可以仍然使用<code class="language-text">React.createPortal</code>,只不过去掉<code class="language-text">hidden</code>类。从而使插入Modal的body不用重复地被插入移除。</li>
+</ul></div></div></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.page={"componentChunkName":"component---src-templates-post-js","jsonName":"post-写一个-react全局组件-ea1","path":"/post/写一个React全局组件"};window.dataPath="724/path---post-写一个-react全局组件-ea-1-d27-jkbGiMwjoohcjTkTJHNZabYE";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-9e853ca0473879fabc7b.js"],"component---src-templates-post-js":["/component---src-templates-post-js-79b80049d6f02b2f808c.js"],"component---src-templates-blog-list-js":["/component---src-templates-blog-list-js-7d37f8ade2abcd8fb583.js"],"component---src-pages-page-js":["/component---src-pages-page-js-6b454277fbe7e5be4505.js"],"pages-manifest":["/pages-manifest-3789d09b8187c09ad4ad.js"]};/*]]>*/</script><script src="/webpack-runtime-e9b6a546e66f865ac139.js" async=""></script><script src="/app-9e853ca0473879fabc7b.js" async=""></script><script src="/styles-e6b6a307c6b9df920a5d.js" async=""></script><script src="/component---src-templates-post-js-79b80049d6f02b2f808c.js" async=""></script></body></html>

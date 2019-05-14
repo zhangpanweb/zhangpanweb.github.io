@@ -1,0 +1,140 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="/styles.770cf382041e7ad46ae0.css">code[class*=language-],pre[class*=language-]{color:#c5c8c6;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Inconsolata,Monaco,Courier New,Courier,monospace;direction:ltr;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#1d1f21}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#7c7c7c}.token.punctuation{color:#c5c8c6}.namespace{opacity:.7}.token.keyword,.token.property,.token.tag{color:#96cbfe}.token.class-name{color:#ffffb6;text-decoration:underline}.token.boolean,.token.constant{color:#9c9}.token.deleted,.token.symbol{color:#f92672}.token.number{color:#ff73fd}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a8ff60}.token.variable{color:#c6c5fe}.token.operator{color:#ededed}.token.entity{color:#ffffb6}.token.url{color:#96cbfe}.language-css .token.string,.style .token.string{color:#87c38a}.token.atrule,.token.attr-value{color:#f9ee98}.token.function{color:#dad085}.token.regex{color:#e9c062}.token.important{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}body,html{background-color:#f3f3f3;word-break:break-word}@font-face{font-family:Consolas;src:url(/static/consola-dd67cc82c437fd23ab38a8efead69e47.ttf) format("truetype")}blockquote{position:relative}blockquote:before{content:"";position:absolute;margin-left:-20px;width:5px;height:100%;background:#eaeaea}:not(pre)>code[class*=language-]{background:#efefed;color:rgba(23,22,22,.92);text-shadow:none;font-size:100%}pre[class*=language-]{background:#313131;font-size:13px}</style><meta name="generator" content="Gatsby 2.1.11"/><title data-react-helmet="true"></title><link as="script" rel="preload" href="/component---src-templates-post-js-79b80049d6f02b2f808c.js"/><link as="script" rel="preload" href="/styles-e6b6a307c6b9df920a5d.js"/><link as="script" rel="preload" href="/app-9e853ca0473879fabc7b.js"/><link as="script" rel="preload" href="/webpack-runtime-e9b6a546e66f865ac139.js"/><link as="fetch" rel="preload" href="/static/d/412/path---post-webpack的bundle-splitting-73-a-e84-iVl7V4SycaZpLvZ4qSSwY3z0E.json" crossorigin="use-credentials"/></head><body><noscript id="gatsby-noscript">This app works best with JavaScript enabled.</noscript><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group"><style data-emotion-css="1am5tay">.css-1am5tay{margin:50px auto 50px;max-width:770px;padding-top:50px;padding:50px;background:white;}</style><div class="css-1am5tay ezt8jpi0"><style data-emotion-css="bqntim">.css-bqntim{margin-bottom:50px;font-size:25px;}</style><h2 class="css-bqntim ezt8jpi1">Webpack的bundle-splitting</h2><style data-emotion-css="s4undb">.css-s4undb{font-size:15px;}.css-s4undb h6{font-size:100%;}.css-s4undb h5{font-size:120%;}.css-s4undb h4{font-size:140%;}.css-s4undb h2{font-size:200%;}.css-s4undb *{line-height:1.8;}</style><div class="css-s4undb"><p>在打包React文件时，如果只有一个入口，在不利用代码拆分的方式下，最后的打包出来会只有一个文件。拆分包，则是把这一个最终的包拆分为多个。拆分包带来的好处是，如果将一个包拆分为"业务包"和"依赖包"后，浏览器会加载两个包，在业务包被更新后，可以利用浏览器缓存，无需再下载依赖包，只需下载业务包即可完成整个展示。</p>
+<p>拆分包，对于浏览器的第一次加载不一定有好处，因为需要从加载一个包变成加载多个包。但是当用户频繁访问一个网站时，拆分包的好处便展示出来了，它可以利用浏览器缓存，无需加载已缓存且未变化的包，从而增加二次加载的速度。</p>
+<hr>
+<h4>场景</h4>
+<p>先整体看一下webpack的包拆分情况：</p>
+<ul>
+<li>在webpack中设置一个入口，在不做其他设置、代码中没有异步引用的情况下，打包出来的内容一般是一个chunk。如果设置多个入口文件，则会打包出多个chunk，比如下面配置，打包出来是<code class="language-text">a.budnle.js</code>和<code class="language-text">b.bundle.js</code>。</li>
+</ul>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript">entry<span class="token punctuation">:</span><span class="token punctuation">{</span>
+    a<span class="token punctuation">:</span><span class="token string">'./src/a.js'</span><span class="token punctuation">,</span>
+    b<span class="token punctuation">:</span><span class="token string">'./src/b.js'</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span>
+output<span class="token punctuation">:</span><span class="token punctuation">{</span>
+    filename<span class="token punctuation">:</span><span class="token string">'[name].bundle.js'</span><span class="token punctuation">,</span>
+    path<span class="token punctuation">:</span>path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span><span class="token string">'dist'</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span></code></pre></div>
+<ul>
+<li>
+<p>如果只有一个入口，代码或webpack配置进行变更，可能会产生多个chunk。产生多个chunk可以通过改变webpack的<code class="language-text">optimization.splitChunks</code>配置项实现，也可以通过异步导入的方式实现（其实对应的是<code class="language-text">optimization.splitChunks.chunks = &#39;async&#39;</code>）。</p>
+</li>
+<li>
+<p>如果有多个入口，但是多个入口的文件中，引入了相同的文件，则可以把这个相同文件提取出来，作为公共共享包，从而避免一个文件的多次加载。</p>
+</li>
+</ul>
+<p>可以通过设置<code class="language-text">optimization.splitChunks</code>来设置webpack的包拆分方式</p>
+<hr>
+<h4>splitChunks默认配置</h4>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token comment">//...</span>
+  optimization<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+    splitChunks<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      chunks<span class="token punctuation">:</span> <span class="token string">'async'</span><span class="token punctuation">,</span>
+      minSize<span class="token punctuation">:</span> <span class="token number">30000</span><span class="token punctuation">,</span>
+      maxSize<span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+      minChunks<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      maxAsyncRequests<span class="token punctuation">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+      maxInitialRequests<span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+      automaticNameDelimiter<span class="token punctuation">:</span> <span class="token string">'~'</span><span class="token punctuation">,</span>
+      name<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+      cacheGroups<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        vendors<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          test<span class="token punctuation">:</span> <span class="token regex">/[\\/]node_modules[\\/]/</span><span class="token punctuation">,</span>
+          priority<span class="token punctuation">:</span> <span class="token operator">-</span><span class="token number">10</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token keyword">default</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          minChunks<span class="token punctuation">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+          priority<span class="token punctuation">:</span> <span class="token operator">-</span><span class="token number">20</span><span class="token punctuation">,</span>
+          reuseExistingChunk<span class="token punctuation">:</span> <span class="token boolean">true</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre></div>
+<hr>
+<h4>chunks值</h4>
+<p>chunks的取值可以是<code class="language-text">async</code>、<code class="language-text">initial</code>、<code class="language-text">all</code>三个值中的一个。下面参照 <a href="https://medium.com/dailyjs/webpack-4-splitchunks-plugin-d9fbbe091fd0">Webpack4-神奇的SplitChunks插件</a> 这篇文章，对这三个值做一个解释。</p>
+<ul>
+<li>
+<p>第一种情况下，设置值为<code class="language-text">async</code>：只有异步加载的包才会被放在一个新的chunk中</p>
+<ul>
+<li>此时，a和b中，lodash都是采用的异步加载，所以他们会被放在一个新的chunk中(<code class="language-text">0.bundle.js</code>)</li>
+<li>a中，jquery和react都是同步加载的，所以 <code class="language-text">a.bundle.js</code>中把 jquery和react都放进了包里面</li>
+<li>b中，jquery是同步加载的，所以<code class="language-text">b.bundle.js</code>中包含了jquery，但是因为react是异步加载的，所以react被放入到了一个新的chunk(<code class="language-text">1.bundle.js</code>)中</li>
+<li>注意到，此时jquery既存在于 <code class="language-text">a.bundle.js</code>中，也存在于<code class="language-text">a.bundle.js</code>中，也存在于<code class="language-text">b.bundle.js</code>中</li>
+</ul>
+</li>
+<li>
+<p>第二种情况下，设置值为<code class="language-text">initial</code>：此时，对异步加载的包不做限制，但对于每个入口，首次加载时，所有的内容需要在一个包中</p>
+<ul>
+<li>a和b中，lodash都是异步加载，所以被放在新的chunk中(<code class="language-text">0.bundle.js</code>)</li>
+<li>a和b中，jquery都是同步加载的，但是由于它同时在a和b中，超过了splitChunks中默认的<code class="language-text">minChunks:2</code>，也就是说，它会被重新重新提取出来，到一个公共共享chunk中(<code class="language-text">verdor~a~b.bundle.js</code>)。此时如果更改一下<code class="language-text">minChunks</code>的值，如下，改为3。此时打包出来的情况，jquery会既在a的chunk中，也在b的chunk中</li>
+</ul>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript">splitChunks<span class="token punctuation">:</span><span class="token punctuation">{</span>
+  cacheGroups<span class="token punctuation">:</span><span class="token punctuation">{</span>
+    vendor<span class="token punctuation">:</span><span class="token punctuation">{</span>
+      test<span class="token punctuation">:</span><span class="token regex">/[\\/]node_modules[\\/]/</span><span class="token punctuation">,</span>
+      chunks<span class="token punctuation">:</span><span class="token string">'initial'</span><span class="token punctuation">,</span>
+      minChunks<span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+   <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div>
+<ul>
+<li>a中，react是直接引用的，因为有<code class="language-text">vendor</code>的test设置，所以遇到<code class="language-text">node_modules</code>中的包，都会被分出来，于是a中的react被放在了<code class="language-text">vendor~a.bundle.js</code>中。而b中的react是异步引入的，所以被放在一个另外的文件<code class="language-text">1.bundle.js</code>中</li>
+</ul>
+</li>
+<li>
+<p>第三种情况下，设置值为<code class="language-text">all</code>：不在意异步加载或同步加载，对所有包进行自动优化</p>
+<ul>
+<li>此时，react、jquery和lodash都在单独的chunk中</li>
+<li>react在a中同步，在b中异步，所以react到了一个单独的文件中(<code class="language-text">0.bundle.js</code>)</li>
+<li>lodash被两个文件异步加载，也到了另外一个单独文件中(<code class="language-text">1.bundle.js</code>)</li>
+<li>jquery被两个文件同时同步加载，所以它到了一个公共共享的chunk中(<code class="language-text">vendor~a~b.bundle.js</code>)</li>
+</ul>
+</li>
+</ul>
+<p>另外，在文章中，所有的配置都是下面形式的，但是它是等价于下面代码形式的</p>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token comment">//配置1</span>
+splitChunks<span class="token punctuation">:</span><span class="token punctuation">{</span>
+  <span class="token comment">// chunks:'initial',</span>
+  cacheGroups<span class="token punctuation">:</span><span class="token punctuation">{</span>
+    vendor<span class="token punctuation">:</span><span class="token punctuation">{</span>
+      test<span class="token punctuation">:</span><span class="token regex">/[\\/]node_modules[\\/]/</span><span class="token punctuation">,</span>
+       chunks<span class="token punctuation">:</span><span class="token string">'initial'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+  
+<span class="token comment">// 在没有其他配置的情况下，等价于</span>
+
+<span class="token comment">//配置2</span>
+  splitChunks<span class="token punctuation">:</span><span class="token punctuation">{</span>
+     chunks<span class="token punctuation">:</span><span class="token string">'initial'</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span></code></pre></div>
+<p>等价的原因是，splitChunks 有默认的<code class="language-text">vendors</code>设置，你会发现，如果是用配置1，则所有的共共享chunk名字都是以<code class="language-text">vendor</code>开头，而使用配置2，所有的共享包，都会以<code class="language-text">vendors</code>开头。配置1覆盖了默认的<code class="language-text">vendors</code>配置，而配置2则没有覆盖，所以都是以默认的<code class="language-text">vendors</code>配置走的。</p>
+<hr>
+<h4>其他配置项</h4>
+<ul>
+<li>minChunks：默认为2，表示，当文件的被引用次数 >= 2 时，被拆分为一个单独的chunk</li>
+<li>maxAsyncRequests：按需加载chunk时，最大平行请求数</li>
+<li>maxInitialRequests：对一个入口，最大平行请求数</li>
+<li>minSize：当产生的chunk大于这个值时，才会成为一个chunk</li>
+<li>name：chunk的名字</li>
+</ul>
+<hr>
+<h4>cacheGroups:</h4>
+<ul>
+<li>test:  检测哪些包应该被放入chunk中，例如正则表达式<code class="language-text">/node_modules/</code>，表示，在引入包的时候，引入路径里面包含<code class="language-text">/node_modules/</code>，则这个包符合这个<code class="language-text">cacheGroups</code>的考虑范畴。至于是否被放入到chunk中，需要视<code class="language-text">chunks</code>的值而视。</li>
+<li>splitChunks层级设置的<code class="language-text">chunks</code>、<code class="language-text">minChunks</code>等值，同样适用于<code class="language-text">cacheGroups</code>，<code class="language-text">cacheGroups</code>值会覆盖<code class="language-text">splitChunks</code>中的值。而<code class="language-text">cacheGroups</code>中未设置的值会向上在<code class="language-text">splitChunks</code>下寻找，若也找不到，则使用默认值。</li>
+<li>priority：如果一个文件同时满足多个<code class="language-text">cacheGroups</code>，则根据此配置决定进入那个<code class="language-text">cacheGroups</code>指定的chunk</li>
+<li>enforce：enforce为true，则可以强制chunk被拆分出来。如果需要这个包被强制拆分时会很有用，比如，默认情况下，<code class="language-text">splitChunks.minSize=30000</code>，也就是说一个chunk的大小达到30k的时候，webpack才会把它真的形成一个chunk，否则会把它放在其他chunk中。这个时候设置enforce为true，则可以使包忽略这些设置，强制让它成为一个新的chunk。</li>
+</ul>
+<hr>
+<h4>参考</h4>
+<ul>
+<li><a href="https://survivejs.com/webpack/building/bundle-splitting/">Bunlde Splitting</a></li>
+<li><a href="https://medium.com/dailyjs/webpack-4-splitchunks-plugin-d9fbbe091fd0">Webpack 4 — Mysterious SplitChunks Plugin</a></li>
+<li><a href="https://hackernoon.com/the-100-correct-way-to-split-your-chunks-with-webpack-f8a9df5b7758">The 100% correct way to split your chunks with Webpack</a></li>
+<li><a href="https://itnext.io/react-router-and-webpack-v4-code-splitting-using-splitchunksplugin-f0a48f110312">Webpack (v4) Code Splitting using SplitChunksPlugin</a></li>
+<li><a href="https://webpack.js.org/plugins/split-chunks-plugin/">SplitChunksPlugin</a></li>
+</ul></div></div></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.page={"componentChunkName":"component---src-templates-post-js","jsonName":"post-webpack的bundle-splitting-73a","path":"/post/Webpack的bundle-splitting"};window.dataPath="412/path---post-webpack的bundle-splitting-73-a-e84-iVl7V4SycaZpLvZ4qSSwY3z0E";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-9e853ca0473879fabc7b.js"],"component---src-templates-post-js":["/component---src-templates-post-js-79b80049d6f02b2f808c.js"],"component---src-templates-blog-list-js":["/component---src-templates-blog-list-js-7d37f8ade2abcd8fb583.js"],"component---src-pages-page-js":["/component---src-pages-page-js-6b454277fbe7e5be4505.js"],"pages-manifest":["/pages-manifest-3789d09b8187c09ad4ad.js"]};/*]]>*/</script><script src="/webpack-runtime-e9b6a546e66f865ac139.js" async=""></script><script src="/app-9e853ca0473879fabc7b.js" async=""></script><script src="/styles-e6b6a307c6b9df920a5d.js" async=""></script><script src="/component---src-templates-post-js-79b80049d6f02b2f808c.js" async=""></script></body></html>

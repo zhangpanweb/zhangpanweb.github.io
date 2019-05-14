@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="/styles.770cf382041e7ad46ae0.css">code[class*=language-],pre[class*=language-]{color:#c5c8c6;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Inconsolata,Monaco,Courier New,Courier,monospace;direction:ltr;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#1d1f21}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#7c7c7c}.token.punctuation{color:#c5c8c6}.namespace{opacity:.7}.token.keyword,.token.property,.token.tag{color:#96cbfe}.token.class-name{color:#ffffb6;text-decoration:underline}.token.boolean,.token.constant{color:#9c9}.token.deleted,.token.symbol{color:#f92672}.token.number{color:#ff73fd}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a8ff60}.token.variable{color:#c6c5fe}.token.operator{color:#ededed}.token.entity{color:#ffffb6}.token.url{color:#96cbfe}.language-css .token.string,.style .token.string{color:#87c38a}.token.atrule,.token.attr-value{color:#f9ee98}.token.function{color:#dad085}.token.regex{color:#e9c062}.token.important{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}body,html{background-color:#f3f3f3;word-break:break-word}@font-face{font-family:Consolas;src:url(/static/consola-dd67cc82c437fd23ab38a8efead69e47.ttf) format("truetype")}blockquote{position:relative}blockquote:before{content:"";position:absolute;margin-left:-20px;width:5px;height:100%;background:#eaeaea}:not(pre)>code[class*=language-]{background:#efefed;color:rgba(23,22,22,.92);text-shadow:none;font-size:100%}pre[class*=language-]{background:#313131;font-size:13px}</style><meta name="generator" content="Gatsby 2.1.11"/><title data-react-helmet="true"></title><link as="script" rel="preload" href="/component---src-templates-post-js-79b80049d6f02b2f808c.js"/><link as="script" rel="preload" href="/styles-e6b6a307c6b9df920a5d.js"/><link as="script" rel="preload" href="/app-9e853ca0473879fabc7b.js"/><link as="script" rel="preload" href="/webpack-runtime-e9b6a546e66f865ac139.js"/><link as="fetch" rel="preload" href="/static/d/645/path---post-nodejs事件循环-fbb-e86-mzrIKYOC1SYSuLiOS3rqkY2vutU.json" crossorigin="use-credentials"/></head><body><noscript id="gatsby-noscript">This app works best with JavaScript enabled.</noscript><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group"><style data-emotion-css="1am5tay">.css-1am5tay{margin:50px auto 50px;max-width:770px;padding-top:50px;padding:50px;background:white;}</style><div class="css-1am5tay ezt8jpi0"><style data-emotion-css="bqntim">.css-bqntim{margin-bottom:50px;font-size:25px;}</style><h2 class="css-bqntim ezt8jpi1">Nodejs事件循环</h2><style data-emotion-css="s4undb">.css-s4undb{font-size:15px;}.css-s4undb h6{font-size:100%;}.css-s4undb h5{font-size:120%;}.css-s4undb h4{font-size:140%;}.css-s4undb h2{font-size:200%;}.css-s4undb *{line-height:1.8;}</style><div class="css-s4undb"><h4>总览</h4>
+<p>node事件循环的各个阶段，如下图所示：</p>
+<div class="gatsby-highlight" data-language="markdown"><pre class="language-markdown"><code class="language-markdown">   ┌───────────────────────────┐
+┌─>│           timers          │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │     pending callbacks     │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │       idle, prepare       │
+│  └─────────────┬─────────────┘      ┌───────────────┐
+│  ┌─────────────┴─────────────┐      │   incoming:   │
+│  │           poll            │&lt;─────┤  connections, │
+│  └─────────────┬─────────────┘      │   data, etc.  │
+│  ┌─────────────┴─────────────┐      └───────────────┘
+│  │           check           │
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+└──┤      close callbacks      │
+   └───────────────────────────┘</code></pre></div>
+<hr>
+<h4>总体执行流程</h4>
+<p>node代码执行的流程：</p>
+<p>在你通过node执行一个脚本时，比如<code class="language-text">node my-scripts.js</code>。</p>
+<ul>
+<li>在单线程作用下，node会先执行所有同步的主代码。</li>
+<li>
+<p>在所有同步代码执行完毕后，node会查看事件循环是否存活，在事件循环中是否有待执行内容。</p>
+<ul>
+<li>若事件循环中无待执行内容，则尝试执行退出回调，比如<code class="language-text">process.on(&#39;exit&#39;,foo)</code>，执行完毕后退出。</li>
+<li>若事件循环中有带执行内容，则进入事件循环，按照上图所示的各个阶段依次执行。</li>
+</ul>
+</li>
+<li>一个循环执行完毕后，会再次检测循环是否存活，是否有待执行内容，若有，则开启新的一轮循环；若无，则程序执行退出操作，进行退出。</li>
+</ul>
+<p>以服务器代码为例，开启服务器，则会先执行所有同步的主流程代码，然后进入事件循环，其他非请求事件执行完毕后，服务器进入到监听请求状态，事件循环会不断进行，监听请求，请求进入后，事件循环执行I/O回调，完毕后再次进入监听状态。</p>
+<hr>
+<h4>各阶段详情</h4>
+<h5>timers 阶段</h5>
+<p>通过<code class="language-text">setTimeout</code>和<code class="language-text">setInterval</code>指定的内容都将在这个阶段被执行。当循环进行到这个阶段时，时间到期的定时回调会被执行。</p>
+<p>在Timers阶段中，各个定时器会按照距离需要执行的时间从近到远的顺序，被放在一个堆内存中。当事件循环执行到这个阶段时，会依次获取堆中的定时器，查看定时器是否到期，若到期，则执行定时器回调，执行后查看下一个，若下一个也到期，则继续执行，直到：</p>
+<ul>
+<li>遇到第一个未到期的定时器，则停止执行，进入事件循环下一个阶段。因为定时器按照距离需要执行事件从近到远的顺序排列，所以遇到第一个未到期的定时器，则表示后面的定时器都是未到期的。</li>
+<li>或者事件循环在这个阶段的执行事件超过系统限定的此阶段的最大时长，此时也需要停止此阶段的处理，进入下一阶段。</li>
+</ul>
+<h5>pending 阶段</h5>
+<p>这个阶段会执行被挂起的 I/O 回调。大多数的 I/O 回调都会在轮询到 I/O 结束时直接立马被调用（在poll阶段中），但是有一些回调会被推迟到下一个循环，被上一个循环推迟的 I/O 回调会在这个阶段被执行。</p>
+<p>当事件循环进入到这个阶段时，会依次执行上一个循环中被推迟的I/O回调，直到队列总的所有回调都被执行完，或者总执行时长达到系统限定的此阶段执行时间。</p>
+<h5>Idle，Prepare 阶段</h5>
+<p>libUV 内部使用</p>
+<h5>poll 阶段</h5>
+<p>轮询阶段执行的内容是：检索新的I/O事件，执行I/O回调。除关闭函数、计时器回调及 <code class="language-text">setImmediate()</code>等指定的回调外的其他回调，几乎都是在这个阶段被执行的。事件循环进入到这个阶段后：</p>
+<ul>
+<li>若此轮询执行队列中已经有内容，则会直接处理队列中的内容，直到队列为空或者执行时间达到系统指定最长时限</li>
+<li>如果轮询队列中没有内容，node会进行等待，等待I/O回调被添加到轮询执行队列中，若有回调被添加，则立即执行。</li>
+</ul>
+<p>如上所说到的，轮询队列可能会进行等待，等待的时间受各种因素影响：</p>
+<ul>
+<li>如果事件循环以<code class="language-text">UV_RUN_NOWAIT</code>形式进行，则不进行等待，直接进入下一阶段</li>
+<li>如果事件循环需要停止，则不进行等待</li>
+<li>如果没有活跃的处理或请求，也就相当于没有后续需要等待被处理的I/O回调，则不进行等待</li>
+<li>如果idle阶段有活跃的内容待处理，则不等待</li>
+<li>如果关闭阶段有内容在等待被处理，则不等待</li>
+<li>如果上面情况都没有出现，则查看timer阶段中的堆内存，取第一个计时器的，等待时间根据距离这个定时器执行需要的时间而定。如果此时没有活跃的定时器，则等待时间为无穷大。(等待时间为无穷大，但是整个阶段受系统指定此阶段处理最大时间限制，到达这个限制时间还是会进入下一个阶段)</li>
+</ul>
+<h5>check 阶段</h5>
+<p>执行通过<code class="language-text">setImmediate()</code>注册的回调。事件循环到这个阶段时，会依次同步地执行<code class="language-text">setImmediate</code>回调，直到所有回调被执行完或者达到系统限定的此阶段执行时间。</p>
+<h5>close 阶段</h5>
+<p>执行close事件的回调，比如<code class="language-text">socket.on(&#39;close&#39;, …)</code>。</p>
+<hr>
+<h4>nextTickQueue 和 microTaskQueue</h4>
+<p><code class="language-text">nextTickQueue</code>和<code class="language-text">microTaskQueue</code>是另外两个与node事件循环有关的队列。<code class="language-text">nextTickQueue</code>中存放调用<code class="language-text">process.nextTick()</code>指定的回调。<code class="language-text">microTaskQueue</code>中存放宏任务回调，比如resolved的Promise回调。他们不是在<code class="language-text">libUV</code>库中原生实现的，而是在<code class="language-text">node.js</code>上层中实现的。</p>
+<p>这两个队列中的任务会被尽快执行，其执行时间，是事件循环从一个阶段进入下一个阶段的间隙。和事件循环的各个阶段不同，这两个队列的执行没有系统时间限制，node会执行它们，直到队列为空。</p>
+<p><code class="language-text">nextTickQueue</code> 相对 <code class="language-text">microTaskQueue</code> 拥有更高的优先级。(需要注意的是，如果使用的是V8提供的原生Promise，nextTickQueue的优先级高于作为宏任务回调的Promise回调，但是如果使用的是<code class="language-text">q</code>或者<code class="language-text">bluebird</code>这类JS库提供的Promise，情况则不一样了。)</p>
+<hr>
+<p>参考文章：</p>
+<p><a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/">nodejs事件循环、计时器和<code class="language-text">process.nextTick()</code></a></p>
+<p><a href="http://voidcanvas.com/nodejs-event-loop/">nodejs事件循环的流程和生命周期</a></p>
+<p><a href="https://jsblog.insiderattack.net/event-loop-and-the-big-picture-nodejs-event-loop-part-1-1cb67a182810">nodejs事件循环概览</a></p>
+<p><a href="http://docs.libuv.org/en/v1.x/design.html#the-i-o-loop">libuv的I/O循环</a></p></div></div></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.page={"componentChunkName":"component---src-templates-post-js","jsonName":"post-nodejs事件循环-fbb","path":"/post/Nodejs事件循环"};window.dataPath="645/path---post-nodejs事件循环-fbb-e86-mzrIKYOC1SYSuLiOS3rqkY2vutU";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-9e853ca0473879fabc7b.js"],"component---src-templates-post-js":["/component---src-templates-post-js-79b80049d6f02b2f808c.js"],"component---src-templates-blog-list-js":["/component---src-templates-blog-list-js-7d37f8ade2abcd8fb583.js"],"component---src-pages-page-js":["/component---src-pages-page-js-6b454277fbe7e5be4505.js"],"pages-manifest":["/pages-manifest-3789d09b8187c09ad4ad.js"]};/*]]>*/</script><script src="/webpack-runtime-e9b6a546e66f865ac139.js" async=""></script><script src="/app-9e853ca0473879fabc7b.js" async=""></script><script src="/styles-e6b6a307c6b9df920a5d.js" async=""></script><script src="/component---src-templates-post-js-79b80049d6f02b2f808c.js" async=""></script></body></html>
