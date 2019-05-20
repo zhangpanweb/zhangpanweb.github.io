@@ -1,0 +1,71 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="/styles.2df82b7fabbbaffc2435.css">code[class*=language-],pre[class*=language-]{color:#c5c8c6;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Inconsolata,Monaco,Courier New,Courier,monospace;direction:ltr;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#1d1f21}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#7c7c7c}.token.punctuation{color:#c5c8c6}.namespace{opacity:.7}.token.keyword,.token.property,.token.tag{color:#96cbfe}.token.class-name{color:#ffffb6;text-decoration:underline}.token.boolean,.token.constant{color:#9c9}.token.deleted,.token.symbol{color:#f92672}.token.number{color:#ff73fd}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a8ff60}.token.variable{color:#c6c5fe}.token.operator{color:#ededed}.token.entity{color:#ffffb6}.token.url{color:#96cbfe}.language-css .token.string,.style .token.string{color:#87c38a}.token.atrule,.token.attr-value{color:#f9ee98}.token.function{color:#dad085}.token.regex{color:#e9c062}.token.important{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}body,html{word-break:break-word}@font-face{font-family:Consolas;src:url(/static/consola-dd67cc82c437fd23ab38a8efead69e47.ttf) format("truetype")}blockquote{position:relative}blockquote:before{content:"";position:absolute;margin-left:-20px;width:5px;height:100%;background:#eaeaea}:not(pre)>code[class*=language-]{background:#efefed;color:rgba(23,22,22,.92);text-shadow:none;font-size:100%}pre[class*=language-]{background:#313131;font-size:13px}</style><meta name="generator" content="Gatsby 2.1.11"/><title data-react-helmet="true"></title><link as="script" rel="preload" href="/component---src-templates-post-js-5144e2763294d5ac9dab.js"/><link as="script" rel="preload" href="/styles-e6b6a307c6b9df920a5d.js"/><link as="script" rel="preload" href="/app-9e853ca0473879fabc7b.js"/><link as="script" rel="preload" href="/webpack-runtime-f307f3dac8c706dc22e2.js"/><link as="fetch" rel="preload" href="/static/d/139/path---post-浏览器内部：浏览器进程-8-a-0-d64-2bcGTYN2HFDZa2Sxyw5gs7ccg8.json" crossorigin="use-credentials"/></head><body><noscript id="gatsby-noscript">This app works best with JavaScript enabled.</noscript><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group"><style data-emotion-css="qtu3xq">.css-qtu3xq{margin:50px auto 50px;max-width:770px;padding-top:50px;padding:50px;background:white;border:1px solid #cacaca;border-radius:5px;}</style><div class="css-qtu3xq ezt8jpi0"><style data-emotion-css="bqntim">.css-bqntim{margin-bottom:50px;font-size:25px;}</style><h2 class="css-bqntim ezt8jpi1">浏览器内部：浏览器进程</h2><style data-emotion-css="s4undb">.css-s4undb{font-size:15px;}.css-s4undb h6{font-size:100%;}.css-s4undb h5{font-size:120%;}.css-s4undb h4{font-size:140%;}.css-s4undb h2{font-size:200%;}.css-s4undb *{line-height:1.8;}</style><div class="css-s4undb"><h4>进程概述</h4>
+<p>浏览器的多进程，以chrome为例</p>
+<ul>
+<li>
+<p>Browser进程</p>
+<ul>
+<li>控制chrome的用户界面。所谓的用户界面，指的是浏览器网页窗口上面的部分，包括：地址栏、书签、向前向后按钮等</li>
+<li>负责网络请求、文件访问等不可见的底层服务</li>
+<li>负责各页面管理，创建和销毁其他进程</li>
+</ul>
+</li>
+<li>
+<p>渲染进程</p>
+<ul>
+<li>渲染进程负责页面渲染、脚本处理等内容</li>
+<li>每个tab有一个自己的独立的渲染进程，这么做的好处是：1、如果某个tab崩溃，不会影响其他tab的正常运行；2、隔离每个tab，避免一些跨tab造成的安全问题</li>
+</ul>
+</li>
+<li>
+<p>插件进程</p>
+<ul>
+<li>负责插件处理</li>
+<li>每个插件对应于一个插件进程</li>
+</ul>
+</li>
+<li>
+<p>GPU进程</p>
+<ul>
+<li>负责GPU任务(GPU会负责处理来自各个应用的请求，并且在同一个界面上进行绘制)</li>
+</ul>
+</li>
+<li>
+<p>其他</p>
+<ul>
+<li>比如一些工具进程等</li>
+</ul>
+</li>
+</ul>
+<p>可以在chrome的任务管理器中查看各个进程，其中每一行为一个进程，而且可以看到每个进程 CPU和内存的使用情况</p>
+<hr>
+<h4>进程合作</h4>
+<p>以在chrome地址栏输入网址为例，说明浏览器各进程之前的合作的：</p>
+<ul>
+<li>在chrome地址栏输入网址，<strong>Browser进程</strong>中的<strong>UI线程</strong>获取输入内容，然后分辨这个输入是一个地址还是一个查询字符串，chrome的地址栏既可以直接访问网址也可以进行搜索引擎查询。若是一个地址，则说明接下来需要对此网址进行请求；否则表示应该请求对应搜索引擎</li>
+<li>
+<p><strong>Browser进程</strong>中的<strong>UI线程</strong>展示网络正在请求的指示器，比如loading图标等；<strong>Browser进程</strong>的<strong>network线程</strong>对响应网络进行请求处理，包括DNS查询、建立TCP连接等</p>
+<ul>
+<li>如果此时<strong>network线程</strong>收到一个重定向的服务器返回，则告知<strong>UI线程</strong>进行重定向，展示不同的网址，并对重定向网址进行网络请求</li>
+</ul>
+</li>
+<li>
+<p><strong>network线程</strong>收到服务端返回后，首先查看返回内容的<code class="language-text">Content-Type</code>请求头，以确定返回内容的类型。由于<code class="language-text">Content-Type</code>请求头可能丢失或错误，所以可能会进行<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types">MIME_types 嗅探</a>。根据<code class="language-text">Content-Type</code>及嗅探结果，确定返回内容的类型后，<strong>Browser进程</strong>会根据内容类型进行不同的处理。</p>
+<ul>
+<li>如果内容是HTML文件，则接下来会会把返回数据交给<strong>Render进程</strong>进行页面渲染如果内容是zip文件或其他文件等，意味着返回内容是待下载内容，则将数据传递给下载管理器</li>
+<li>类型的确定不是等到所有内容都下载完才进行，在收到需要的数据之后便可以进行。下面的几部也都是在接受数据的同时同步进行的。</li>
+</ul>
+</li>
+<li>
+<p>另外，在接收到返回内容后，也会对内容进行跨域等安全检查。如果确定内容没有问题，并且属于对应请求的网址，则<strong>network进程</strong>会告知<strong>UI进程</strong>数据加载结束，<strong>UI进程</strong>则会寻找一个<strong>Render线程</strong>来进行页面渲染</p>
+<ul>
+<li>为了节省时间，在进行网络请求期间，<strong>UI进程</strong>会提前确定好后续进行页面渲染的<strong>Render线程</strong>，当数据加载完毕后，则直接将数据交给之前已经准备好的<strong>Render线程</strong>。</li>
+<li>需要注意的是，如果页面被重定向到了一个对于现在域名跨域的域名，则需要另外一个<strong>Render进程</strong>进行渲染</li>
+</ul>
+</li>
+<li>通过以上步骤，数据在加载中，并且已经有准备好的页面渲染的<strong>Render线程</strong>，则<strong>Browser进程</strong>通过IPC将数据发送给<strong>Render进程</strong>，<strong>Render进程</strong>开始进行网页渲染。</li>
+<li>当<strong>Render进程</strong>结束渲染，执行完所有<code class="language-text">onload</code>事件后，通过IPC告知<strong>Browser进程</strong>，<strong>Browser进程</strong>的<strong>UI线程</strong>展示停止"加载中"的指示，显示加载完成。</li>
+</ul>
+<hr>
+<p>参考内容</p>
+<p><a href="https://developers.google.com/web/updates/2018/09/inside-browser-part2">浏览器内部运行机制</a></p>
+<p><a href="http://www.dailichun.com/2018/01/21/js_singlethread_eventloop.html">从浏览器多进程到JS单线程，JS运行机制最全面的一次梳理</a></p></div></div></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.page={"componentChunkName":"component---src-templates-post-js","jsonName":"post-浏览器内部：浏览器进程-8a0","path":"/post/浏览器内部：浏览器进程"};window.dataPath="139/path---post-浏览器内部：浏览器进程-8-a-0-d64-2bcGTYN2HFDZa2Sxyw5gs7ccg8";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-9e853ca0473879fabc7b.js"],"component---src-templates-post-js":["/component---src-templates-post-js-5144e2763294d5ac9dab.js"],"component---src-templates-blog-list-js":["/component---src-templates-blog-list-js-1377c674db8a0f810940.js"],"component---src-pages-page-js":["/component---src-pages-page-js-6b454277fbe7e5be4505.js"],"pages-manifest":["/pages-manifest-d72b8c60d3e2d7cd0e5d.js"]};/*]]>*/</script><script src="/webpack-runtime-f307f3dac8c706dc22e2.js" async=""></script><script src="/app-9e853ca0473879fabc7b.js" async=""></script><script src="/styles-e6b6a307c6b9df920a5d.js" async=""></script><script src="/component---src-templates-post-js-5144e2763294d5ac9dab.js" async=""></script></body></html>
