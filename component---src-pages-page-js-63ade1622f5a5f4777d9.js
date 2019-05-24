@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{166:function(t,e,n){"use strict";n.r(e);var o=n(19),a=n(1),c=(n(0),Object(o.a)("div",{target:"e8p12hz0"})({name:"6zbv2u",styles:"display:flex;justify-content:center;margin-top:100px;font-size:50px;color:gray;"}));e.default=function(){return Object(a.b)(c,null,"渊虹小站")}}}]);
+//# sourceMappingURL=component---src-pages-page-js-63ade1622f5a5f4777d9.js.map
