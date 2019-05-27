@@ -1,0 +1,208 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="/styles.2ed8fe7009bb70f05244.css">code[class*=language-],pre[class*=language-]{color:#c5c8c6;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Inconsolata,Monaco,Courier New,Courier,monospace;direction:ltr;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#1d1f21}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#7c7c7c}.token.punctuation{color:#c5c8c6}.namespace{opacity:.7}.token.keyword,.token.property,.token.tag{color:#96cbfe}.token.class-name{color:#ffffb6;text-decoration:underline}.token.boolean,.token.constant{color:#9c9}.token.deleted,.token.symbol{color:#f92672}.token.number{color:#ff73fd}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a8ff60}.token.variable{color:#c6c5fe}.token.operator{color:#ededed}.token.entity{color:#ffffb6}.token.url{color:#96cbfe}.language-css .token.string,.style .token.string{color:#87c38a}.token.atrule,.token.attr-value{color:#f9ee98}.token.function{color:#dad085}.token.regex{color:#e9c062}.token.important{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}body,html{word-break:break-word}@font-face{font-family:Consolas;src:url(/static/consola-dd67cc82c437fd23ab38a8efead69e47.ttf) format("truetype")}blockquote{position:relative}blockquote:before{content:"";position:absolute;margin-left:-20px;width:5px;height:100%;background:#eaeaea}:not(pre)>code[class*=language-]{background:#efefed;color:rgba(23,22,22,.92);text-shadow:none;font-size:100%}pre[class*=language-]{background:#313131;font-size:13px}a{color:#000}</style><meta name="generator" content="Gatsby 2.1.11"/><title data-react-helmet="true">渊虹小站</title><meta data-react-helmet="true" charSet="utf-8"/><link as="script" rel="preload" href="/component---src-templates-post-js-9d80db0b64bd32842847.js"/><link as="script" rel="preload" href="/styles-80ccae9686bb97b4a954.js"/><link as="script" rel="preload" href="/app-2e67e8fdb1bf97f32128.js"/><link as="script" rel="preload" href="/webpack-runtime-14f92587f558966327e5.js"/><link as="fetch" rel="preload" href="/static/d/943/path---post-浏览器内部：事件循环-574-2f8-m2aQVjFx2ja2mn6H3GbBtpgsflE.json" crossorigin="use-credentials"/></head><body><noscript id="gatsby-noscript">This app works best with JavaScript enabled.</noscript><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group"><style data-emotion-css="v5xann">.css-v5xann{margin:0 auto;max-width:770px;margin-top:50px;padding:0 20px;}</style><div class="css-v5xann e1od515v0"><style data-emotion-css="xi606m">.css-xi606m{text-align:center;}</style><div class="css-xi606m e1tr7xln0"><style data-emotion-css="1xn3edc">.css-1xn3edc{margin-bottom:30px;}</style><h2 class="css-1xn3edc e1tr7xln1">渊虹小站</h2><style data-emotion-css="uj6wai">.css-uj6wai{margin:30px;}.css-uj6wai a{margin:0 15px;}</style><div class="css-uj6wai e1tr7xln2"><a href="/">首页</a><a href="/collections">收藏</a></div></div><style data-emotion-css="qtu3xq">.css-qtu3xq{margin:50px auto 50px;max-width:770px;padding-top:50px;padding:50px;background:white;border:1px solid #cacaca;border-radius:5px;}</style><div class="css-qtu3xq ezt8jpi0"><style data-emotion-css="bqntim">.css-bqntim{margin-bottom:50px;font-size:25px;}</style><h2 class="css-bqntim ezt8jpi1">浏览器内部：事件循环</h2><style data-emotion-css="s4undb">.css-s4undb{font-size:15px;}.css-s4undb h6{font-size:100%;}.css-s4undb h5{font-size:120%;}.css-s4undb h4{font-size:140%;}.css-s4undb h2{font-size:200%;}.css-s4undb *{line-height:1.8;}</style><div class="css-s4undb"><p>浏览器中，整个JavaScript的运行环境，在Render进程中。帮助JavaScript运行起来的主要线程包括：</p>
+<ul>
+<li>JavaScript 引擎线程</li>
+<li>事件触发线程</li>
+<li>定时器线程</li>
+<li>异步http线程</li>
+</ul>
+<p>先说明一下浏览器中JavaScript事件循环的整体流程，再来看各个线程在其中起的作用。</p>
+<hr>
+<h4>浏览器事件循环</h4>
+<p>浏览器事件循环的总体流程如下：</p>
+<p><a
+    class="gatsby-resp-image-link"
+    href="/static/ec4678143310d56afe5fe10178291c84/de852/JavaScript%20event%20loop.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-wrapper"
+    style="position: relative; display: block;  max-width: 531px; margin-left: auto; margin-right: auto;"
+  >
+    <span
+      class="gatsby-resp-image-background-image"
+      style="padding-bottom: 54.802259887005654%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAALCAYAAAB/Ca1DAAAACXBIWXMAAAsSAAALEgHS3X78AAABV0lEQVQoz12TCw6CQAxEuf/RuIAhYADByB/koyBgzWtSgzZptrs7nU674AzDIH3fS9u2Ute1zPMsy7LoavHz+ZR1XWWaJrndbpKmqZ69Xi91cNw3TSMOmzzP1QFv2yb/RhLn+75r4ev1Kvf7XYs9Ho8vbhxHcQBjgFBqhtowDL+EqIMUnOu64vu+YhBiRrcOJFShMlU5pBIxLUBEXBSFtlWWpXiepys48n4IOSCR1rGu6/TCjLYgY2YYY4HQBJD7QwgBKlBq63EuqKI12rb4crmoOsMzivf7rQWUkA1gHAAXKEYVVU0xag1HDBZi9vba35ZNFcm0CCkJxMfH+n99e1QzVcghlYhZeTmGXlWVJEmibjM+GiJstnxSKFWFx1YgzbJMh07MIxCTzMyCIJDz+SxxHMvpdNIYAWDpxAFEFdz+DpK5xBkBd8wZ9ajlW8SjKNK/hk5s9h/EHU8hhsIx7AAAAABJRU5ErkJggg=='); background-size: cover; display: block;"
+    ></span>
+    <img
+        class="gatsby-resp-image-image"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;box-shadow:inset 0px 0px 0px 400px white;"
+        alt="JavaScript event loop"
+        title=""
+        src="/static/ec4678143310d56afe5fe10178291c84/de852/JavaScript%20event%20loop.png"
+        srcset="/static/ec4678143310d56afe5fe10178291c84/da694/JavaScript%20event%20loop.png 138w,
+/static/ec4678143310d56afe5fe10178291c84/b49ee/JavaScript%20event%20loop.png 275w,
+/static/ec4678143310d56afe5fe10178291c84/de852/JavaScript%20event%20loop.png 531w"
+        sizes="(max-width: 531px) 100vw, 531px"
+      />
+  </span>
+  </a></p>
+<p>各组成部分：</p>
+<ul>
+<li>JavaScript引擎，进行JavaScript的解析与执行，所有JavaScript代码的执行全部在JavaScript引擎中</li>
+<li>WebApis。由浏览器提供的api，执行例如DOM事件、Ajax请求、定时器等任务。其中包括定时器线程、异步http线程等webapi对应的线程，他们负责进行进行对应的api调用，而且不属于JavaScript引擎。</li>
+<li>事件循环队列。维护回调事件组成的队列</li>
+</ul>
+<p>整体流程：</p>
+<ul>
+<li>JavaScript引擎根据调用栈中的函数调用，依次执行JavaScript代码。其中，若调用有调用Webapi，则对相应Api进行调用，注册对应api调用与回调事件。如代码为<code class="language-text">setTimeout(()=&gt;console.log(&quot;here&quot;),100)</code>，则调用定时器。</li>
+<li>Webapi执行对应调用，当执行完成后，将回调函数传递给事件循环队列。事件循环队列接受回调后，将此回调放在事件循环队列最后。比如上述的<code class="language-text">setTimeout</code>定义了100ms的定时，则定时器开始计时，到100ms时，将回调<code class="language-text">()=&gt;console.log(&quot;here&quot;)</code>传递给事件循环队列。</li>
+<li>当调用栈为空时，JavaScript从事件循环队列开头去除回调函数，放入调用栈中，执行回调。</li>
+</ul>
+<hr>
+<h4>JavaScript引擎</h4>
+<p>如上图所示，JavaScript引擎中主要包括两大部分：</p>
+<ul>
+<li>内存堆，提供程序运行所需内存</li>
+<li>调用栈，维护JavaScript程序调用栈</li>
+</ul>
+<p>JavaScript是单线程的，而这个单线程，也就是说在JavaScript引擎中，在一个特定时间，JavaScript只能执行一个任务，一行代码，不能同时执行多项任务。代码的执行顺序，则严格按照调用栈的程序调用顺序。</p>
+<h5>调用栈</h5>
+<p>调用栈维护的程序调用及返回顺序，调用栈是一个先进后出的栈结构。</p>
+<ul>
+<li>每次对函数的调用，将会把此函数压入栈底</li>
+<li>每次函数返回，则将函数从栈顶释放</li>
+</ul>
+<p>比如以下代码：</p>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">c</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"c"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">b</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"b"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">c</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"a"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">b</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre></div>
+<p>代码执行即对应调用栈为：</p>
+<ul>
+<li>开始执行代码，调用栈为 main </li>
+<li>执行a。调用栈：main —> a</li>
+<li>函数a执行，执行<code class="language-text">console.log(&quot;a&quot;)</code>。调用栈：main —> a —> console.log</li>
+<li><code class="language-text">console.log</code>执行，打印<code class="language-text">a</code>，然后退出<code class="language-text">console.log</code>，调用栈变为 main —> a</li>
+<li>执行<code class="language-text">b()</code>，调用b函数，进入函数b中，调用栈变为 main —> a —> b</li>
+<li>然后执行<code class="language-text">console.log</code>，调用栈变为 main —> a —> b —> console.log</li>
+<li><code class="language-text">console.log</code>执行完毕，调用栈变为 main —> a —> b</li>
+<li>然后调用c，进入c函数，调用栈变为 main —> a —> b —> c</li>
+<li>执行 <code class="language-text">console.log</code>，调用栈变为 main —> a —> b —> c —> console.log</li>
+<li><code class="language-text">console.log</code>执行完毕，调用栈变为 main —> a —> b —> c</li>
+<li>从c函数退出，回到b函数，调用栈变为main —> a —> b</li>
+<li>从b函数退出，调用栈变为main —> a </li>
+<li>从a函数退出，调用栈变为 main</li>
+<li>代码执行完毕，调用栈变为空</li>
+</ul>
+<h5>调用循环队列</h5>
+<p>JavaScript引擎会按照代码从上往下进行调用执行</p>
+<ul>
+<li>执行流程形成调用栈</li>
+<li>执行过程中，若需要对webapi进行调用，则调用webapi</li>
+<li>当代码执行完毕调用栈为空时，便开始执行事件循环队列中的回调</li>
+<li>每次从事件循环队列的头部获取一个回调，执行此回调时，依然形成对此回调执行的调用栈</li>
+<li>当上一个回调执行结束，调用栈回到空状态，则从事件循环队列获取一下一个回调，并进行执行</li>
+<li>循环上述流程，直到将所有回调全部执行完毕</li>
+</ul>
+<hr>
+<h4>webApi与事件循环队列</h4>
+<p>webApis中包含各种浏览器Api调用，比如</p>
+<ul>
+<li>DOM api，根据JavaScript，注册各类事件，比如点击事件，注册后，若用户进行点击，则将点击事件回调传递给事件循环队列</li>
+<li>定时器，若JavaScript执行<code class="language-text">setTimeout</code>或<code class="language-text">setInterval</code>，则向定时器注册定时任务，定时器将进行计时，达到执行事件后，将定时器回调传递给事件循环队列</li>
+<li>http事件同理，进行http请求，请求结束后，将请求回调及请求数据传递给事件循环队列</li>
+</ul>
+<p>事件循环队列每次收到webApi传递来的回调事件及回调数据，则将回调事件及数据放在队列最后，当 JavaScript 调用栈为空时，从循环队列开头，依次将一个个回调事件及数据传递给JavaScript引擎进行执行。</p>
+<hr>
+<h4>异步代码执行流程</h4>
+<p>综合上述内容，若代码如下：</p>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"a"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"timeout"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"b"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div>
+<p>执行流程为：</p>
+<ul>
+<li>调用<code class="language-text">console.log</code>，调用栈变为 main —> console.log ，<code class="language-text">console.log</code>执行完毕后，调用栈回到 main</li>
+<li>执行<code class="language-text">setTimeout</code>，调用webapi的定时器，将回调函数传递给定时器，由于设置的超时时间为0，定时器此时会立马把回调传递给时间循环队列，时间循环队列将回调放入队列中</li>
+<li>此时JavaScript执行扔在主代码序列中，调用栈为 main 。继续往下，进入 <code class="language-text">console.log(&quot;b&quot;)</code>，执行<code class="language-text">console</code>，调用栈变为 main —> console，<code class="language-text">console.log(&quot;b&quot;)</code>调用结束，调用栈回到 main</li>
+<li><code class="language-text">console.log(&quot;b&quot;)</code>执行完毕后，主代码序列全部执行完毕，调用栈变为空</li>
+<li>此时，开始从循环队列中取出回调进行执行，于是，取出<code class="language-text">()=&gt;console.log(&quot;timeout&quot;)</code>，进行执行，从代码开始执行到执行完毕，调用栈先变为 console.log，后变为空</li>
+</ul>
+<hr>
+<h4>macrotask &#x26; microtask</h4>
+<p>在上面的讲述中，事件循环队列只是一个队列，然而实际上，并不是只有一个队列。然而，事实上应该有两个主要的执行队列。</p>
+<ul>
+<li>
+<p>macrotask</p>
+<ul>
+<li>宏任务，也被称为task，从概念上来说，可以看做是一个执行主体。在执行时，是一个task接着一个task，依次进行执行的。</li>
+<li>被认为是宏任务的内容包括：setTimeout、setInterval、I/O</li>
+</ul>
+</li>
+<li>
+<p>microtask</p>
+<ul>
+<li>微任务。会尽快被执行的任务，包括：原生promise、process.nextTick(Node中)</li>
+</ul>
+</li>
+</ul>
+<h5>执行流程</h5>
+<p>macrotask、microtask、UI渲染，三者，在某个时刻，只能有一个在执行，它们的执行流程为：</p>
+<p><a
+    class="gatsby-resp-image-link"
+    href="/static/51d427aca96a32ca17615dca9aa916e7/10478/macrotask%26microtask.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-wrapper"
+    style="position: relative; display: block;  max-width: 361px; margin-left: auto; margin-right: auto;"
+  >
+    <span
+      class="gatsby-resp-image-background-image"
+      style="padding-bottom: 52.90858725761773%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAALCAYAAAB/Ca1DAAAACXBIWXMAAAsSAAALEgHS3X78AAABB0lEQVQoz42S5wqEQAyE9/0fz38i9oIFe685JrCHLqdnIC4GnZ18iaiqijzPoyzLKM9zSpKE1nXlPI7jmwh5PoXAwzAM6vueCxDsuo6Korh8+FZcwGHbtlTXNTvEO8K2bSrLkrZto2VZLsKPgvu+0zl93yfTNPmUGUURdzAMw8XtL2GhthWGIbsLgoBPy7KYL5iiC4nmDoNQC03T8E/gKBOC8zxTHMfkOA6N48iYVDMXh3dMUIczCKN113WZLXjjEuTZqVBBqwmumDhEwRMbAcdIuQ3njRB3+3RGIRFM08SOMBwpmKYp6brOdQiLf4t6h0JeAJYQxzBfO1QxIDAgIABTONQ0jWsfALVZTWKpmCQAAAAASUVORK5CYII='); background-size: cover; display: block;"
+    ></span>
+    <img
+        class="gatsby-resp-image-image"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;box-shadow:inset 0px 0px 0px 400px white;"
+        alt="macrotaskµtask"
+        title=""
+        src="/static/51d427aca96a32ca17615dca9aa916e7/10478/macrotask%26microtask.png"
+        srcset="/static/51d427aca96a32ca17615dca9aa916e7/c4105/macrotask%26microtask.png 138w,
+/static/51d427aca96a32ca17615dca9aa916e7/ae54d/macrotask%26microtask.png 275w,
+/static/51d427aca96a32ca17615dca9aa916e7/10478/macrotask%26microtask.png 361w"
+        sizes="(max-width: 361px) 100vw, 361px"
+      />
+  </span>
+  </a></p>
+<ul>
+<li>在执行时，会先取一个task执行</li>
+<li>task执行完毕后，获取执行期间的所有microtask，把所有microtask全部执行完毕</li>
+<li>若JavaScript执行对UI有改变，则执行UI渲染</li>
+<li>UI渲染完成后，进行下一个task的执行</li>
+<li>按照上述步骤循环往复</li>
+</ul>
+<p>所以，以下代码：</p>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"a"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span>console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"b"</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token punctuation">{</span>
+	console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"c"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"d"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"e"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div>
+<p>执行的打印顺序为<code class="language-text">a - e - c - d - b</code></p>
+<hr>
+<p>参考内容</p>
+<p><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">https://www.youtube.com/watch?v=8aGhZQkoFbQ</a></p>
+<p><a href="https://www.i-programmer.info/programming/javascript/11337-javascript-async-microtasks.html">https://www.i-programmer.info/programming/javascript/11337-javascript-async-microtasks.html</a></p>
+<p><a href="http://www.dailichun.com/2018/01/21/js_singlethread_eventloop.html">http://www.dailichun.com/2018/01/21/js<em>singlethread</em>eventloop.html</a></p></div></div></div></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.page={"componentChunkName":"component---src-templates-post-js","jsonName":"post-浏览器内部：事件循环-574","path":"/post/浏览器内部：事件循环"};window.dataPath="943/path---post-浏览器内部：事件循环-574-2f8-m2aQVjFx2ja2mn6H3GbBtpgsflE";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-2e67e8fdb1bf97f32128.js"],"component---src-templates-post-js":["/component---src-templates-post-js-9d80db0b64bd32842847.js"],"component---src-templates-blog-list-js":["/component---src-templates-blog-list-js-4cd2d5b557281ec3d956.js"],"component---src-templates-collection-js":["/component---src-templates-collection-js-65934d2d940329c25314.js"],"component---src-pages-page-js":["/component---src-pages-page-js-63ade1622f5a5f4777d9.js"],"pages-manifest":["/pages-manifest-b80605428aaa37ce855b.js"]};/*]]>*/</script><script src="/webpack-runtime-14f92587f558966327e5.js" async=""></script><script src="/app-2e67e8fdb1bf97f32128.js" async=""></script><script src="/styles-80ccae9686bb97b4a954.js" async=""></script><script src="/component---src-templates-post-js-9d80db0b64bd32842847.js" async=""></script></body></html>
