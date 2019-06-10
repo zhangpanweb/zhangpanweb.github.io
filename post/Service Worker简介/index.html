@@ -1,0 +1,135 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style data-href="/styles.2ed8fe7009bb70f05244.css">code[class*=language-],pre[class*=language-]{color:#c5c8c6;text-shadow:0 1px rgba(0,0,0,.3);font-family:Consolas,Inconsolata,Monaco,Courier New,Courier,monospace;direction:ltr;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em}:not(pre)>code[class*=language-],pre[class*=language-]{background:#1d1f21}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#7c7c7c}.token.punctuation{color:#c5c8c6}.namespace{opacity:.7}.token.keyword,.token.property,.token.tag{color:#96cbfe}.token.class-name{color:#ffffb6;text-decoration:underline}.token.boolean,.token.constant{color:#9c9}.token.deleted,.token.symbol{color:#f92672}.token.number{color:#ff73fd}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#a8ff60}.token.variable{color:#c6c5fe}.token.operator{color:#ededed}.token.entity{color:#ffffb6}.token.url{color:#96cbfe}.language-css .token.string,.style .token.string{color:#87c38a}.token.atrule,.token.attr-value{color:#f9ee98}.token.function{color:#dad085}.token.regex{color:#e9c062}.token.important{color:#fd971f}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}body,html{word-break:break-word}@font-face{font-family:Consolas;src:url(/static/consola-dd67cc82c437fd23ab38a8efead69e47.ttf) format("truetype")}blockquote{position:relative}blockquote:before{content:"";position:absolute;margin-left:-20px;width:5px;height:100%;background:#eaeaea}:not(pre)>code[class*=language-]{background:#efefed;color:rgba(23,22,22,.92);text-shadow:none;font-size:100%}pre[class*=language-]{background:#313131;font-size:13px}a{color:#000}</style><meta name="generator" content="Gatsby 2.1.11"/><title data-react-helmet="true">渊虹小站</title><meta data-react-helmet="true" charSet="utf-8"/><link as="script" rel="preload" href="/component---src-templates-post-js-9d80db0b64bd32842847.js"/><link as="script" rel="preload" href="/styles-80ccae9686bb97b4a954.js"/><link as="script" rel="preload" href="/app-2e67e8fdb1bf97f32128.js"/><link as="script" rel="preload" href="/webpack-runtime-760f13150d88b7f91e74.js"/><link as="fetch" rel="preload" href="/static/d/803/path---post-service-worker简介-878-881-toSGuVBnagRDMu5hGNPRIEoDdA.json" crossorigin="use-credentials"/></head><body><noscript id="gatsby-noscript">This app works best with JavaScript enabled.</noscript><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group"><style data-emotion-css="v5xann">.css-v5xann{margin:0 auto;max-width:770px;margin-top:50px;padding:0 20px;}</style><div class="css-v5xann e1od515v0"><style data-emotion-css="xi606m">.css-xi606m{text-align:center;}</style><div class="css-xi606m e1tr7xln0"><style data-emotion-css="1xn3edc">.css-1xn3edc{margin-bottom:30px;}</style><h2 class="css-1xn3edc e1tr7xln1">渊虹小站</h2><style data-emotion-css="uj6wai">.css-uj6wai{margin:30px;}.css-uj6wai a{margin:0 15px;}</style><div class="css-uj6wai e1tr7xln2"><a href="/">首页</a><a href="/collections">收藏</a></div></div><style data-emotion-css="qtu3xq">.css-qtu3xq{margin:50px auto 50px;max-width:770px;padding-top:50px;padding:50px;background:white;border:1px solid #cacaca;border-radius:5px;}</style><div class="css-qtu3xq ezt8jpi0"><style data-emotion-css="bqntim">.css-bqntim{margin-bottom:50px;font-size:25px;}</style><h2 class="css-bqntim ezt8jpi1">Service Worker简介</h2><style data-emotion-css="s4undb">.css-s4undb{font-size:15px;}.css-s4undb h6{font-size:100%;}.css-s4undb h5{font-size:120%;}.css-s4undb h4{font-size:140%;}.css-s4undb h2{font-size:200%;}.css-s4undb *{line-height:1.8;}</style><div class="css-s4undb"><p>Service Worker，其主要作用是作为一个网页与Web服务器间的代理服务器。它可以缓存资源，并在网页请求对应资源时，劫持网页请求，直接返回已缓存的资源，从而节省网络加载时间，以及在无网络条件下正常加载页面。</p>
+<hr>
+<h4>工作流程</h4>
+<p>整体工作流程如下：</p>
+<p><a
+    class="gatsby-resp-image-link"
+    href="/static/20ac395243cae239fd859f586dadfb72/15bad/service-worker.png"
+    style="display: block"
+    target="_blank"
+    rel="noopener"
+  >
+    <span
+    class="gatsby-resp-image-wrapper"
+    style="position: relative; display: block;  max-width: 541px; margin-left: auto; margin-right: auto;"
+  >
+    <span
+      class="gatsby-resp-image-background-image"
+      style="padding-bottom: 74.12199630314232%; position: relative; bottom: 0; left: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAYAAADkmO9VAAAACXBIWXMAAAsSAAALEgHS3X78AAABaElEQVQ4y4WU67KCMAyE+/6PqD/AEVG5CCJyFeP5MpMz1XrpTMYS2s3uJuLkb2VZJmVZspX7/S6vi5zlL5eLrNdr2e12T+9tuXme/y/cbrcAwL/wqZi/3Pl8lqqqpK5rrb4sSwDyLQKGbdvK4XCQoiik67qA5evlnwxhNgyD9H2vDL8tiqEAELMqYNg0jSCbABDwaZqegssUPJ1O2rw0TdUi8gHg9XpVDwn2yDbGFjxTmDNMxHa71eK+PYFkgH5JtmIw+wiI1DzPVQ4sYDSOo170f2ke7I7HozJk/66B6iFgNjY+oAXPsMM/pgECnH8LyGEkmPnfFh0GhPC77Mt2ny7CxDqPAn5hZTkahA28I8d+v9+LYwSQwnDjCxLNV/KbzUaBzEfySZKo3+QAB4gAw0VRpEZziARS7O8IAKCME5JsfGCFp+Tw3JijSj8OSCTMQ/yM41gHmMp0lT1F+cqwJ2fvyEFqtVrJA2HnjvKx9/E9AAAAAElFTkSuQmCC'); background-size: cover; display: block;"
+    ></span>
+    <img
+        class="gatsby-resp-image-image"
+        style="width:100%;height:100%;margin:0;vertical-align:middle;position:absolute;top:0;left:0;box-shadow:inset 0px 0px 0px 400px white;"
+        alt="service worker"
+        title=""
+        src="/static/20ac395243cae239fd859f586dadfb72/15bad/service-worker.png"
+        srcset="/static/20ac395243cae239fd859f586dadfb72/0d23f/service-worker.png 138w,
+/static/20ac395243cae239fd859f586dadfb72/6bae1/service-worker.png 275w,
+/static/20ac395243cae239fd859f586dadfb72/15bad/service-worker.png 541w"
+        sizes="(max-width: 541px) 100vw, 541px"
+      />
+  </span>
+  </a></p>
+<ul>
+<li>
+<p>加载并执行主线程JavaScript，主线程调用<code class="language-text">serviceWorkerContainer.register()</code>注册service worker</p>
+<ul>
+<li><code class="language-text">serviceWorkerContainer.register()</code>包含两个参数，第一个参数是指定service worker脚本的url地址第二个参数为可选配置项</li>
+<li>调用此方法后，将会调用浏览器API执行service worker的注册操作</li>
+<li>此方法返回一个Promise，可以通过指定<code class="language-text">resolve</code>方法对service worker进行检测，也可以指定<code class="language-text">reject</code>方法捕获错误</li>
+</ul>
+</li>
+<li>注册service worker后，service work在一个被称作<code class="language-text">ServiceWorkerGlobalScope</code>的执行上下文中被执行，这个执行环节是独立于主线程的，无DOM操作权限。</li>
+<li>service worker在注册及工作过程中，浏览器会通过事件的方式告知service worker所处的阶段以及网页发起的请求等。service worker通过注册事件处理器来对这些事件进行反应，做出相应处理</li>
+<li>在主线程进行注册后，service worker首先收到的是<code class="language-text">install</code>事件，这个事件表示service worker的安装，可以在此事件的事件处理器中执行建立<code class="language-text">IndexedDB</code>、初始化缓存内容的事务。<code class="language-text">install</code>事件的事件处理器执行完毕后，即表示此service worker已安装</li>
+<li>之后是<code class="language-text">activate</code>事件，activate事件主要用来清理老版本service worker的过期资源，从而达到释放存储空间等目的。</li>
+<li>
+<p>在这之后，service worker即会正式接管页面</p>
+<ul>
+<li>此时，service woker处于监听状态，比如，如果网页发起请求，浏览器便会通过<code class="language-text">fetch</code>事件，将请求移交给service worker，service worker内部可以通过注册<code class="language-text">fetch</code>事件处理器，来处理网页请求</li>
+<li>需要注意的是，service worker接管的页面，是在完成注册之后打开的页面，所以原注册页面不会被接管，如果需要被接管，页面需要被刷新</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h4>代码</h4>
+<p>结合<a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers#Basic_architecture">MDN上的一个实例</a>来说明一下service worker的工作流程，具体代码可见<a href="https://github.com/mdn/sw-test/">github仓库</a>。</p>
+<ul>
+<li>如下代码，app.js在主线程中执行，调用<code class="language-text">navigator.serviceWorker.register</code>注册service worker，将文件<code class="language-text">sw.js</code>中的脚本加载进service worker的执行环境进行执行</li>
+</ul>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token comment">// app.js</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token string">'serviceWorker'</span> <span class="token keyword">in</span> navigator<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  navigator<span class="token punctuation">.</span>serviceWorker<span class="token punctuation">.</span><span class="token function">register</span><span class="token punctuation">(</span><span class="token string">'./sw.js'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>reg<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">if</span><span class="token punctuation">(</span>reg<span class="token punctuation">.</span>installing<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Service worker installing'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>reg<span class="token punctuation">.</span>waiting<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Service worker installed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>reg<span class="token punctuation">.</span>active<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Service worker active'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">catch</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>error<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// registration failed</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Registration failed with '</span> <span class="token operator">+</span> error<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div>
+<ul>
+<li>此脚本在service worker执行环境中注册了install事件处理器，当service worker的install事件被触发时，事件处理器被调用。在此事件处理器中，调用<code class="language-text">event.waitUntil</code>将install延迟至<code class="language-text">watiUntil</code>中的内容处理完毕。在<code class="language-text">waituntil</code>中，初始化了一个名称为<code class="language-text">v1</code>的缓存器，并将页面所需资源添加至缓存器中。</li>
+</ul>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token comment">// sw.js</span>
+
+self<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'install'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  event<span class="token punctuation">.</span><span class="token function">waitUntil</span><span class="token punctuation">(</span>
+    caches<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'v1'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>cache<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> cache<span class="token punctuation">.</span><span class="token function">addAll</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+        <span class="token string">'./'</span><span class="token punctuation">,</span>
+        <span class="token string">'./index.html'</span><span class="token punctuation">,</span>
+        <span class="token string">'./style.css'</span><span class="token punctuation">,</span>
+        <span class="token string">'./app.js'</span><span class="token punctuation">,</span>
+        <span class="token string">'./image-list.js'</span><span class="token punctuation">,</span>
+        <span class="token string">'./star-wars-logo.jpg'</span><span class="token punctuation">,</span>
+        <span class="token string">'./gallery/bountyHunters.jpg'</span><span class="token punctuation">,</span>
+        <span class="token string">'./gallery/myLittleVader.jpg'</span><span class="token punctuation">,</span>
+        <span class="token string">'./gallery/snowTroopers.jpg'</span>
+      <span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div>
+<ul>
+<li>注册<code class="language-text">fetch</code>事件，当网页发起请求时，浏览器会触发fetch事件，并将网络请求以<code class="language-text">event.request</code>的方式传递给service worker。在此处理过程中，通过<code class="language-text">cache.match</code>来匹配缓存器中对应的资源。如果资源已经存在，<code class="language-text">response</code>不为undfined，则直接将此资源返回，不再发起网络请求。若资源不存在，则通过<code class="language-text">fetch</code>发起网络请求，获得资源后，先通过<code class="language-text">cache.put</code>将资源存储至缓存器中，然后将资源返回给网页。</li>
+</ul>
+<div class="gatsby-highlight" data-language="javascript"><pre class="language-javascript"><code class="language-javascript"><span class="token comment">// sw.js</span>
+
+self<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'fetch'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>event<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  event<span class="token punctuation">.</span><span class="token function">respondWith</span><span class="token punctuation">(</span>caches<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>request<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span>response<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>response <span class="token operator">!==</span> undefined<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> response<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+      <span class="token keyword">return</span> <span class="token function">fetch</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>request<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span>response<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> responseClone <span class="token operator">=</span> response<span class="token punctuation">.</span><span class="token function">clone</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        caches<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">'v1'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span>cache<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          cache<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>request<span class="token punctuation">,</span> responseClone<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> response<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token keyword">catch</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> caches<span class="token punctuation">.</span><span class="token function">match</span><span class="token punctuation">(</span><span class="token string">'./gallery/myLittleVader.jpg'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div>
+<hr>
+<h4>更多</h4>
+<ul>
+<li>对于activate事件，其用法和install事件类似，它可以用来清楚老版本的过期资源，具体实例可见<a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers#Updating_your_service_worker">MDN文档</a></li>
+<li>servcie worker除了用来做缓存外，还可以用来进行消息推送等，详情可见：<a href="https://serviceworke.rs/push-get-payload.html">https://serviceworke.rs/push-get-payload.html</a></li>
+</ul>
+<hr>
+<p>参考</p>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers">https://developer.mozilla.org/en-US/docs/Web/API/Service<em>Worker</em>API/Using<em>Service</em>Workers</a></li>
+<li><a href="https://lavas.baidu.com/pwa/offline-and-cache-loading/service-worker/service-worker-introduction">https://lavas.baidu.com/pwa/offline-and-cache-loading/service-worker/service-worker-introduction</a></li>
+<li><a href="https://serviceworke.rs/push-get-payload.html">https://serviceworke.rs/push-get-payload.html</a></li>
+<li><a href="https://developers.google.com/web/fundamentals/primers/service-workers/">https://developers.google.com/web/fundamentals/primers/service-workers/</a></li>
+</ul></div></div></div></div></div><script id="gatsby-script-loader">/*<![CDATA[*/window.page={"componentChunkName":"component---src-templates-post-js","jsonName":"post-service-worker简介-878","path":"/post/Service Worker简介"};window.dataPath="803/path---post-service-worker简介-878-881-toSGuVBnagRDMu5hGNPRIEoDdA";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-2e67e8fdb1bf97f32128.js"],"component---src-templates-post-js":["/component---src-templates-post-js-9d80db0b64bd32842847.js"],"component---src-templates-blog-list-js":["/component---src-templates-blog-list-js-4cd2d5b557281ec3d956.js"],"component---src-templates-collection-js":["/component---src-templates-collection-js-65934d2d940329c25314.js"],"component---src-pages-page-js":["/component---src-pages-page-js-63ade1622f5a5f4777d9.js"],"pages-manifest":["/pages-manifest-2fe4b70e7462d9f0546e.js"]};/*]]>*/</script><script src="/webpack-runtime-760f13150d88b7f91e74.js" async=""></script><script src="/app-2e67e8fdb1bf97f32128.js" async=""></script><script src="/styles-80ccae9686bb97b4a954.js" async=""></script><script src="/component---src-templates-post-js-9d80db0b64bd32842847.js" async=""></script></body></html>
